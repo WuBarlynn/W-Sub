@@ -1,0 +1,27 @@
+# Xcode / Swift
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+*.ipa
+*.dSYM.zip
+
+# Android（后续）
+.gradle/
+local.properties
+*.iml
+.kotlin/
+
+# macOS
+.DS_Store
+
+# 工具缓存
+__pycache__/
+*.pyc
+.workbuddy/
+Payload/
+*.ipa
+
+# SwiftPM
+.build/

@@ -1,0 +1,2842 @@
+{
+ "templates": [
+  {
+   "id": "netflix",
+   "name": "Netflix",
+   "vendor": "Netflix",
+   "categoryID": "streaming",
+   "brand": "netflix",
+   "style": "color",
+   "hex": "#E50914",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "奈飞",
+    "网飞"
+   ],
+   "popularity": 99
+  },
+  {
+   "id": "disney-plus",
+   "name": "Disney+",
+   "vendor": "Disney",
+   "categoryID": "streaming",
+   "brand": "disney-plus",
+   "style": "color",
+   "hex": "#113CCF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "迪士尼"
+   ],
+   "popularity": 88
+  },
+  {
+   "id": "hulu",
+   "name": "Hulu",
+   "vendor": "Disney",
+   "categoryID": "streaming",
+   "brand": "hulu",
+   "style": "color",
+   "hex": "#1CE783",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 72
+  },
+  {
+   "id": "max",
+   "name": "Max",
+   "vendor": "Warner Bros. Discovery",
+   "categoryID": "streaming",
+   "brand": "max",
+   "style": "color",
+   "hex": "#002BE7",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "HBO",
+    "HBO Max"
+   ],
+   "popularity": 66
+  },
+  {
+   "id": "prime-video",
+   "name": "Prime Video",
+   "vendor": "Amazon",
+   "categoryID": "streaming",
+   "brand": "prime-video",
+   "style": "color",
+   "hex": "#00A8E1",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "亚马逊视频"
+   ],
+   "popularity": 78
+  },
+  {
+   "id": "apple-tv-plus",
+   "name": "Apple TV+",
+   "vendor": "Apple",
+   "categoryID": "streaming",
+   "brand": "apple-tv-plus",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 74
+  },
+  {
+   "id": "paramount-plus",
+   "name": "Paramount+",
+   "vendor": "Paramount",
+   "categoryID": "streaming",
+   "brand": "paramount-plus",
+   "style": "color",
+   "hex": "#0064FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 54
+  },
+  {
+   "id": "peacock",
+   "name": "Peacock",
+   "vendor": "NBCUniversal",
+   "categoryID": "streaming",
+   "brand": "peacock",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 48
+  },
+  {
+   "id": "youtube-premium",
+   "name": "YouTube Premium",
+   "vendor": "Google",
+   "categoryID": "streaming",
+   "brand": "youtube-premium",
+   "style": "color",
+   "hex": "#FF0000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "油管会员"
+   ],
+   "popularity": 90
+  },
+  {
+   "id": "twitch",
+   "name": "Twitch",
+   "vendor": "Amazon",
+   "categoryID": "streaming",
+   "brand": "twitch",
+   "style": "color",
+   "hex": "#9146FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 56
+  },
+  {
+   "id": "crunchyroll",
+   "name": "Crunchyroll",
+   "vendor": "Sony",
+   "categoryID": "streaming",
+   "brand": "crunchyroll",
+   "style": "color",
+   "hex": "#F47521",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 44
+  },
+  {
+   "id": "vimeo",
+   "name": "Vimeo",
+   "vendor": "Vimeo",
+   "categoryID": "streaming",
+   "brand": "vimeo",
+   "style": "color",
+   "hex": "#1AB7EA",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "mubi",
+   "name": "MUBI",
+   "vendor": "MUBI",
+   "categoryID": "streaming",
+   "brand": "mubi",
+   "style": "color",
+   "hex": "#001489",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "nebula",
+   "name": "Nebula",
+   "vendor": "Nebula",
+   "categoryID": "streaming",
+   "brand": "nebula",
+   "style": "color",
+   "hex": "#1B1B1B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "iqiyi",
+   "name": "爱奇艺",
+   "vendor": "爱奇艺",
+   "categoryID": "streaming",
+   "brand": "iqiyi",
+   "style": "mono",
+   "hex": "#00BE06",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "iqiyi",
+    "奇异果"
+   ],
+   "popularity": 93
+  },
+  {
+   "id": "tencent-video",
+   "name": "腾讯视频",
+   "vendor": "腾讯",
+   "categoryID": "streaming",
+   "brand": null,
+   "style": "mono",
+   "hex": "#FF6022",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "腾讯视频VIP",
+    "极光TV"
+   ],
+   "popularity": 95
+  },
+  {
+   "id": "youku",
+   "name": "优酷",
+   "vendor": "阿里巴巴",
+   "categoryID": "streaming",
+   "brand": "youku",
+   "style": "mono",
+   "hex": "#1BA6E2",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "youku",
+    "酷喵"
+   ],
+   "popularity": 76
+  },
+  {
+   "id": "mango-tv",
+   "name": "芒果 TV",
+   "vendor": "湖南广电",
+   "categoryID": "streaming",
+   "brand": null,
+   "style": "mono",
+   "hex": "#FF6B00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "芒果TV",
+    "mgtv"
+   ],
+   "popularity": 74
+  },
+  {
+   "id": "bilibili",
+   "name": "哔哩哔哩大会员",
+   "vendor": "Bilibili",
+   "categoryID": "streaming",
+   "brand": "bilibili",
+   "style": "color",
+   "hex": "#FB7299",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "B站",
+    "b站大会员",
+    "bilibili"
+   ],
+   "popularity": 88
+  },
+  {
+   "id": "migu",
+   "name": "咪咕视频",
+   "vendor": "中国移动",
+   "categoryID": "streaming",
+   "brand": "migu",
+   "style": "mono",
+   "hex": "#E60012",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "migu"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "sohu-video",
+   "name": "搜狐视频",
+   "vendor": "搜狐",
+   "categoryID": "streaming",
+   "brand": null,
+   "style": "mono",
+   "hex": "#FF3300",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "sohu"
+   ],
+   "popularity": 32
+  },
+  {
+   "id": "douyin",
+   "name": "抖音",
+   "vendor": "字节跳动",
+   "categoryID": "streaming",
+   "brand": "douyin",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "tiktok",
+    "抖音会员"
+   ],
+   "popularity": 70
+  },
+  {
+   "id": "spotify",
+   "name": "Spotify",
+   "vendor": "Spotify",
+   "categoryID": "music",
+   "brand": "spotify",
+   "style": "color",
+   "hex": "#1DB954",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "声田"
+   ],
+   "popularity": 94
+  },
+  {
+   "id": "apple-music",
+   "name": "Apple Music",
+   "vendor": "Apple",
+   "categoryID": "music",
+   "brand": "apple-music",
+   "style": "color",
+   "hex": "#FA243C",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "苹果音乐"
+   ],
+   "popularity": 90
+  },
+  {
+   "id": "youtube-music",
+   "name": "YouTube Music",
+   "vendor": "Google",
+   "categoryID": "music",
+   "brand": "youtube-music",
+   "style": "color",
+   "hex": "#FF0000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 66
+  },
+  {
+   "id": "amazon-music",
+   "name": "Amazon Music",
+   "vendor": "Amazon",
+   "categoryID": "music",
+   "brand": "amazon-music",
+   "style": "mono",
+   "hex": "#25D1DA",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "tidal",
+   "name": "TIDAL",
+   "vendor": "TIDAL",
+   "categoryID": "music",
+   "brand": "tidal",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 36
+  },
+  {
+   "id": "deezer",
+   "name": "Deezer",
+   "vendor": "Deezer",
+   "categoryID": "music",
+   "brand": "deezer",
+   "style": "color",
+   "hex": "#A238FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "soundcloud",
+   "name": "SoundCloud",
+   "vendor": "SoundCloud",
+   "categoryID": "music",
+   "brand": "soundcloud",
+   "style": "color",
+   "hex": "#FF5500",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "audible",
+   "name": "Audible",
+   "vendor": "Amazon",
+   "categoryID": "music",
+   "brand": "audible",
+   "style": "mono",
+   "hex": "#F8991C",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "有声书"
+   ],
+   "popularity": 48
+  },
+  {
+   "id": "netease-music",
+   "name": "网易云音乐",
+   "vendor": "网易",
+   "categoryID": "music",
+   "brand": "netease-music",
+   "style": "mono",
+   "hex": "#C20C0C",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "网易云",
+    "黑胶VIP"
+   ],
+   "popularity": 87
+  },
+  {
+   "id": "qq-music",
+   "name": "QQ 音乐",
+   "vendor": "腾讯",
+   "categoryID": "music",
+   "brand": "qq-music",
+   "style": "mono",
+   "hex": "#31C27C",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "绿钻",
+    "qqmusic"
+   ],
+   "popularity": 84
+  },
+  {
+   "id": "kugou",
+   "name": "酷狗音乐",
+   "vendor": "腾讯",
+   "categoryID": "music",
+   "brand": null,
+   "style": "mono",
+   "hex": "#2CA2F9",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "kugou"
+   ],
+   "popularity": 62
+  },
+  {
+   "id": "kuwo",
+   "name": "酷我音乐",
+   "vendor": "腾讯",
+   "categoryID": "music",
+   "brand": null,
+   "style": "mono",
+   "hex": "#FFCC00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "kuwo"
+   ],
+   "popularity": 48
+  },
+  {
+   "id": "ximalaya",
+   "name": "喜马拉雅",
+   "vendor": "喜马拉雅",
+   "categoryID": "music",
+   "brand": null,
+   "style": "mono",
+   "hex": "#F86442",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "ximalaya"
+   ],
+   "popularity": 58
+  },
+  {
+   "id": "qingting",
+   "name": "蜻蜓 FM",
+   "vendor": "蜻蜓FM",
+   "categoryID": "music",
+   "brand": null,
+   "style": "mono",
+   "hex": "#00A0E9",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "qingting"
+   ],
+   "popularity": 28
+  },
+  {
+   "id": "siriusxm",
+   "name": "SiriusXM",
+   "vendor": "SiriusXM",
+   "categoryID": "music",
+   "brand": "siriusxm",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "adobe-cc",
+   "name": "Adobe Creative Cloud",
+   "vendor": "Adobe",
+   "categoryID": "software",
+   "brand": "adobe-cc",
+   "style": "mono",
+   "hex": "#FA0F00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "全家桶",
+    "ps",
+    "creative cloud"
+   ],
+   "popularity": 82
+  },
+  {
+   "id": "microsoft-365",
+   "name": "Microsoft 365",
+   "vendor": "Microsoft",
+   "categoryID": "software",
+   "brand": "microsoft-365",
+   "style": "color",
+   "hex": "#D83B01",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "office",
+    "office365"
+   ],
+   "popularity": 86
+  },
+  {
+   "id": "notion",
+   "name": "Notion",
+   "vendor": "Notion Labs",
+   "categoryID": "software",
+   "brand": "notion",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 80
+  },
+  {
+   "id": "evernote",
+   "name": "Evernote",
+   "vendor": "Bending Spoons",
+   "categoryID": "software",
+   "brand": "evernote",
+   "style": "color",
+   "hex": "#00A82D",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "印象笔记"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "todoist",
+   "name": "Todoist",
+   "vendor": "Doist",
+   "categoryID": "software",
+   "brand": "todoist",
+   "style": "color",
+   "hex": "#E44332",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 44
+  },
+  {
+   "id": "obsidian",
+   "name": "Obsidian Sync",
+   "vendor": "Obsidian",
+   "categoryID": "software",
+   "brand": "obsidian",
+   "style": "color",
+   "hex": "#7C3AED",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 46
+  },
+  {
+   "id": "setapp",
+   "name": "Setapp",
+   "vendor": "MacPaw",
+   "categoryID": "software",
+   "brand": "setapp",
+   "style": "mono",
+   "hex": "#6C4BF4",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "1password",
+   "name": "1Password",
+   "vendor": "AgileBits",
+   "categoryID": "software",
+   "brand": "1password",
+   "style": "color",
+   "hex": "#1A8CFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "密码管理器"
+   ],
+   "popularity": 62
+  },
+  {
+   "id": "bitwarden",
+   "name": "Bitwarden",
+   "vendor": "Bitwarden",
+   "categoryID": "software",
+   "brand": "bitwarden",
+   "style": "color",
+   "hex": "#175DDC",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 48
+  },
+  {
+   "id": "dashlane",
+   "name": "Dashlane",
+   "vendor": "Dashlane",
+   "categoryID": "software",
+   "brand": "dashlane",
+   "style": "mono",
+   "hex": "#0E353D",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "grammarly",
+   "name": "Grammarly",
+   "vendor": "Grammarly",
+   "categoryID": "software",
+   "brand": "grammarly",
+   "style": "mono",
+   "hex": "#15C39A",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 44
+  },
+  {
+   "id": "deepl",
+   "name": "DeepL Pro",
+   "vendor": "DeepL",
+   "categoryID": "software",
+   "brand": "deepl",
+   "style": "color",
+   "hex": "#0F2B46",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 46
+  },
+  {
+   "id": "cleanmymac",
+   "name": "CleanMyMac",
+   "vendor": "MacPaw",
+   "categoryID": "software",
+   "brand": null,
+   "style": "mono",
+   "hex": "#F5A623",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "parallels",
+   "name": "Parallels Desktop",
+   "vendor": "Parallels",
+   "categoryID": "software",
+   "brand": "parallels",
+   "style": "color",
+   "hex": "#1F5FA9",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "sketch",
+   "name": "Sketch",
+   "vendor": "Sketch B.V.",
+   "categoryID": "software",
+   "brand": "sketch",
+   "style": "mono",
+   "hex": "#F7B500",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 32
+  },
+  {
+   "id": "figma",
+   "name": "Figma",
+   "vendor": "Figma",
+   "categoryID": "software",
+   "brand": "figma",
+   "style": "color",
+   "hex": "#A259FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 74
+  },
+  {
+   "id": "canva",
+   "name": "Canva Pro",
+   "vendor": "Canva",
+   "categoryID": "software",
+   "brand": "canva",
+   "style": "mono",
+   "hex": "#00C4CC",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 64
+  },
+  {
+   "id": "capcut",
+   "name": "CapCut Pro",
+   "vendor": "字节跳动",
+   "categoryID": "software",
+   "brand": "capcut",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "剪映"
+   ],
+   "popularity": 52
+  },
+  {
+   "id": "affinity",
+   "name": "Affinity",
+   "vendor": "Canva",
+   "categoryID": "software",
+   "brand": "affinity",
+   "style": "mono",
+   "hex": "#1B72BE",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 28
+  },
+  {
+   "id": "procreate",
+   "name": "Procreate",
+   "vendor": "Savage Interactive",
+   "categoryID": "software",
+   "brand": null,
+   "style": "mono",
+   "hex": "#4B4B4B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "wps",
+   "name": "WPS 会员",
+   "vendor": "金山办公",
+   "categoryID": "software",
+   "brand": "wps",
+   "style": "mono",
+   "hex": "#E64C3D",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "金山办公"
+   ],
+   "popularity": 72
+  },
+  {
+   "id": "feishu",
+   "name": "飞书",
+   "vendor": "字节跳动",
+   "categoryID": "software",
+   "brand": null,
+   "style": "mono",
+   "hex": "#3370FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "lark",
+    "feishu"
+   ],
+   "popularity": 58
+  },
+  {
+   "id": "dingtalk",
+   "name": "钉钉",
+   "vendor": "阿里巴巴",
+   "categoryID": "software",
+   "brand": "dingtalk",
+   "style": "mono",
+   "hex": "#0089FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "dingtalk"
+   ],
+   "popularity": 56
+  },
+  {
+   "id": "slack",
+   "name": "Slack",
+   "vendor": "Salesforce",
+   "categoryID": "software",
+   "brand": "slack",
+   "style": "color",
+   "hex": "#4A154B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 54
+  },
+  {
+   "id": "zoom",
+   "name": "Zoom",
+   "vendor": "Zoom",
+   "categoryID": "software",
+   "brand": "zoom",
+   "style": "color",
+   "hex": "#2D8CFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 58
+  },
+  {
+   "id": "google-workspace",
+   "name": "Google Workspace",
+   "vendor": "Google",
+   "categoryID": "software",
+   "brand": "google-workspace",
+   "style": "color",
+   "hex": "#4285F4",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "g suite"
+   ],
+   "popularity": 44
+  },
+  {
+   "id": "miro",
+   "name": "Miro",
+   "vendor": "Miro",
+   "categoryID": "software",
+   "brand": "miro",
+   "style": "color",
+   "hex": "#FFD02F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "airtable",
+   "name": "Airtable",
+   "vendor": "Airtable",
+   "categoryID": "software",
+   "brand": "airtable",
+   "style": "color",
+   "hex": "#18BFFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "monday",
+   "name": "monday.com",
+   "vendor": "monday.com",
+   "categoryID": "software",
+   "brand": "monday",
+   "style": "color",
+   "hex": "#FF3D57",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 32
+  },
+  {
+   "id": "clickup",
+   "name": "ClickUp",
+   "vendor": "ClickUp",
+   "categoryID": "software",
+   "brand": "clickup",
+   "style": "color",
+   "hex": "#7B68EE",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "asana",
+   "name": "Asana",
+   "vendor": "Asana",
+   "categoryID": "software",
+   "brand": "asana",
+   "style": "color",
+   "hex": "#F06A6A",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "icloud-plus",
+   "name": "iCloud+",
+   "vendor": "Apple",
+   "categoryID": "cloud",
+   "brand": "icloud-plus",
+   "style": "mono",
+   "hex": "#3B99FC",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "icloud",
+    "云备份"
+   ],
+   "popularity": 95
+  },
+  {
+   "id": "google-one",
+   "name": "Google One",
+   "vendor": "Google",
+   "categoryID": "cloud",
+   "brand": "google-one",
+   "style": "color",
+   "hex": "#4285F4",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "谷歌云盘",
+    "google drive"
+   ],
+   "popularity": 74
+  },
+  {
+   "id": "onedrive",
+   "name": "OneDrive",
+   "vendor": "Microsoft",
+   "categoryID": "cloud",
+   "brand": "onedrive",
+   "style": "mono",
+   "hex": "#0364B8",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 66
+  },
+  {
+   "id": "dropbox",
+   "name": "Dropbox",
+   "vendor": "Dropbox",
+   "categoryID": "cloud",
+   "brand": "dropbox",
+   "style": "color",
+   "hex": "#0061FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 54
+  },
+  {
+   "id": "box",
+   "name": "Box",
+   "vendor": "Box",
+   "categoryID": "cloud",
+   "brand": "box",
+   "style": "color",
+   "hex": "#0061D5",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 28
+  },
+  {
+   "id": "pcloud",
+   "name": "pCloud",
+   "vendor": "pCloud",
+   "categoryID": "cloud",
+   "brand": "pcloud",
+   "style": "color",
+   "hex": "#1CB4F0",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "mega",
+   "name": "MEGA",
+   "vendor": "MEGA",
+   "categoryID": "cloud",
+   "brand": "mega",
+   "style": "mono",
+   "hex": "#D9272E",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "baidu-netdisk",
+   "name": "百度网盘会员",
+   "vendor": "百度",
+   "categoryID": "cloud",
+   "brand": "baidu-netdisk",
+   "style": "mono",
+   "hex": "#2468F2",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "度盘",
+    "超级会员"
+   ],
+   "popularity": 84
+  },
+  {
+   "id": "aliyun-drive",
+   "name": "阿里云盘",
+   "vendor": "阿里巴巴",
+   "categoryID": "cloud",
+   "brand": null,
+   "style": "mono",
+   "hex": "#6E5BFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "夸克网盘"
+   ],
+   "popularity": 62
+  },
+  {
+   "id": "quark",
+   "name": "夸克网盘",
+   "vendor": "阿里巴巴",
+   "categoryID": "cloud",
+   "brand": "quark",
+   "style": "mono",
+   "hex": "#2B6EF3",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 54
+  },
+  {
+   "id": "xunlei",
+   "name": "迅雷会员",
+   "vendor": "迅雷",
+   "categoryID": "cloud",
+   "brand": "xunlei",
+   "style": "mono",
+   "hex": "#0E7BFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "xunlei"
+   ],
+   "popularity": 44
+  },
+  {
+   "id": "115",
+   "name": "115 网盘",
+   "vendor": "115",
+   "categoryID": "cloud",
+   "brand": null,
+   "style": "mono",
+   "hex": "#2F7BFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "chatgpt",
+   "name": "ChatGPT Plus",
+   "vendor": "OpenAI",
+   "categoryID": "ai",
+   "brand": "chatgpt",
+   "style": "color",
+   "hex": "#10A37F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "gpt",
+    "openai"
+   ],
+   "popularity": 98
+  },
+  {
+   "id": "claude",
+   "name": "Claude Pro",
+   "vendor": "Anthropic",
+   "categoryID": "ai",
+   "brand": "claude",
+   "style": "color",
+   "hex": "#D97757",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "克劳德"
+   ],
+   "popularity": 88
+  },
+  {
+   "id": "gemini",
+   "name": "Gemini Advanced",
+   "vendor": "Google",
+   "categoryID": "ai",
+   "brand": "gemini",
+   "style": "mono",
+   "hex": "#4285F4",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "bard"
+   ],
+   "popularity": 72
+  },
+  {
+   "id": "copilot",
+   "name": "GitHub Copilot",
+   "vendor": "GitHub",
+   "categoryID": "ai",
+   "brand": "copilot",
+   "style": "mono",
+   "hex": "#24292F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "副驾驶"
+   ],
+   "popularity": 76
+  },
+  {
+   "id": "cursor",
+   "name": "Cursor Pro",
+   "vendor": "Anysphere",
+   "categoryID": "ai",
+   "brand": "cursor",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 74
+  },
+  {
+   "id": "midjourney",
+   "name": "Midjourney",
+   "vendor": "Midjourney",
+   "categoryID": "ai",
+   "brand": "midjourney",
+   "style": "color",
+   "hex": "#1B1B3A",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "mj",
+    "画图"
+   ],
+   "popularity": 66
+  },
+  {
+   "id": "perplexity",
+   "name": "Perplexity Pro",
+   "vendor": "Perplexity",
+   "categoryID": "ai",
+   "brand": "perplexity",
+   "style": "color",
+   "hex": "#1FB8CD",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 56
+  },
+  {
+   "id": "poe",
+   "name": "Poe",
+   "vendor": "Quora",
+   "categoryID": "ai",
+   "brand": "poe",
+   "style": "mono",
+   "hex": "#5D5CDE",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "character-ai",
+   "name": "Character.AI",
+   "vendor": "Character.AI",
+   "categoryID": "ai",
+   "brand": "character-ai",
+   "style": "mono",
+   "hex": "#1E1E1E",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 28
+  },
+  {
+   "id": "runway",
+   "name": "Runway",
+   "vendor": "Runway",
+   "categoryID": "ai",
+   "brand": null,
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "elevenlabs",
+   "name": "ElevenLabs",
+   "vendor": "ElevenLabs",
+   "categoryID": "ai",
+   "brand": "elevenlabs",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 32
+  },
+  {
+   "id": "suno",
+   "name": "Suno",
+   "vendor": "Suno",
+   "categoryID": "ai",
+   "brand": "suno",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "replit",
+   "name": "Replit",
+   "vendor": "Replit",
+   "categoryID": "ai",
+   "brand": "replit",
+   "style": "mono",
+   "hex": "#F26207",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 28
+  },
+  {
+   "id": "windsurf",
+   "name": "Windsurf",
+   "vendor": "Codeium",
+   "categoryID": "ai",
+   "brand": null,
+   "style": "mono",
+   "hex": "#09B6A2",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "deepseek",
+   "name": "DeepSeek",
+   "vendor": "深度求索",
+   "categoryID": "ai",
+   "brand": "deepseek",
+   "style": "color",
+   "hex": "#4D6BFE",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 68
+  },
+  {
+   "id": "kimi",
+   "name": "Kimi",
+   "vendor": "月之暗面",
+   "categoryID": "ai",
+   "brand": "kimi",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "kimi智能助手"
+   ],
+   "popularity": 46
+  },
+  {
+   "id": "doubao",
+   "name": "豆包",
+   "vendor": "字节跳动",
+   "categoryID": "ai",
+   "brand": null,
+   "style": "mono",
+   "hex": "#3B6EF6",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 44
+  },
+  {
+   "id": "tongyi",
+   "name": "通义千问",
+   "vendor": "阿里巴巴",
+   "categoryID": "ai",
+   "brand": "tongyi",
+   "style": "mono",
+   "hex": "#615CED",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "qwen"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "wenxin",
+   "name": "文心一言",
+   "vendor": "百度",
+   "categoryID": "ai",
+   "brand": null,
+   "style": "mono",
+   "hex": "#2932E1",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "ernie"
+   ],
+   "popularity": 40
+  },
+  {
+   "id": "grok",
+   "name": "Grok",
+   "vendor": "xAI",
+   "categoryID": "ai",
+   "brand": "grok",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "mistral",
+   "name": "Mistral",
+   "vendor": "Mistral AI",
+   "categoryID": "ai",
+   "brand": "mistral",
+   "style": "color",
+   "hex": "#FA520F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "huggingface",
+   "name": "Hugging Face",
+   "vendor": "Hugging Face",
+   "categoryID": "ai",
+   "brand": "huggingface",
+   "style": "color",
+   "hex": "#FFD21E",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "apple-fitness",
+   "name": "Apple Fitness+",
+   "vendor": "Apple",
+   "categoryID": "fitness",
+   "brand": "apple-fitness",
+   "style": "mono",
+   "hex": "#30D158",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "健身+"
+   ],
+   "popularity": 58
+  },
+  {
+   "id": "peloton",
+   "name": "Peloton",
+   "vendor": "Peloton",
+   "categoryID": "fitness",
+   "brand": "peloton",
+   "style": "mono",
+   "hex": "#DF1C2F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "strava",
+   "name": "Strava",
+   "vendor": "Strava",
+   "categoryID": "fitness",
+   "brand": "strava",
+   "style": "color",
+   "hex": "#FC4C02",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "nike-training",
+   "name": "Nike Training Club",
+   "vendor": "Nike",
+   "categoryID": "fitness",
+   "brand": "nike-training",
+   "style": "mono",
+   "hex": "#111111",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "keep",
+   "name": "Keep 会员",
+   "vendor": "Keep",
+   "categoryID": "fitness",
+   "brand": "keep",
+   "style": "mono",
+   "hex": "#1FB6C9",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "keep"
+   ],
+   "popularity": 64
+  },
+  {
+   "id": "classpass",
+   "name": "ClassPass",
+   "vendor": "ClassPass",
+   "categoryID": "fitness",
+   "brand": null,
+   "style": "mono",
+   "hex": "#0E7C86",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "myfitnesspal",
+   "name": "MyFitnessPal",
+   "vendor": "MyFitnessPal",
+   "categoryID": "fitness",
+   "brand": "myfitnesspal",
+   "style": "mono",
+   "hex": "#0072FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "noom",
+   "name": "Noom",
+   "vendor": "Noom",
+   "categoryID": "fitness",
+   "brand": null,
+   "style": "mono",
+   "hex": "#FF6B00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "whoop",
+   "name": "WHOOP",
+   "vendor": "WHOOP",
+   "categoryID": "fitness",
+   "brand": "whoop",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "oura",
+   "name": "Oura",
+   "vendor": "Oura",
+   "categoryID": "fitness",
+   "brand": "oura",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "fitbit",
+   "name": "Fitbit Premium",
+   "vendor": "Google",
+   "categoryID": "fitness",
+   "brand": "fitbit",
+   "style": "mono",
+   "hex": "#00B0B9",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "zwift",
+   "name": "Zwift",
+   "vendor": "Zwift",
+   "categoryID": "fitness",
+   "brand": "zwift",
+   "style": "mono",
+   "hex": "#FC6719",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "headspace",
+   "name": "Headspace",
+   "vendor": "Headspace",
+   "categoryID": "fitness",
+   "brand": "headspace",
+   "style": "mono",
+   "hex": "#F47D31",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 38
+  },
+  {
+   "id": "calm",
+   "name": "Calm",
+   "vendor": "Calm",
+   "categoryID": "fitness",
+   "brand": "calm",
+   "style": "mono",
+   "hex": "#2E7CD6",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "betterhelp",
+   "name": "BetterHelp",
+   "vendor": "BetterHelp",
+   "categoryID": "fitness",
+   "brand": "betterhelp",
+   "style": "mono",
+   "hex": "#3A7D44",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "nyt",
+   "name": "纽约时报",
+   "vendor": "The New York Times",
+   "categoryID": "news",
+   "brand": "nyt",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "nyt",
+    "new york times"
+   ],
+   "popularity": 56
+  },
+  {
+   "id": "wsj",
+   "name": "华尔街日报",
+   "vendor": "Dow Jones",
+   "categoryID": "news",
+   "brand": "wsj",
+   "style": "mono",
+   "hex": "#0274B6",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "wall street journal",
+    "wsj"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "economist",
+   "name": "经济学人",
+   "vendor": "The Economist",
+   "categoryID": "news",
+   "brand": "economist",
+   "style": "mono",
+   "hex": "#E3120B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "economist"
+   ],
+   "popularity": 44
+  },
+  {
+   "id": "bloomberg",
+   "name": "Bloomberg",
+   "vendor": "Bloomberg",
+   "categoryID": "news",
+   "brand": null,
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "ft",
+   "name": "金融时报",
+   "vendor": "Financial Times",
+   "categoryID": "news",
+   "brand": "ft",
+   "style": "mono",
+   "hex": "#FFF1E5",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "financial times",
+    "ft"
+   ],
+   "popularity": 30
+  },
+  {
+   "id": "washington-post",
+   "name": "华盛顿邮报",
+   "vendor": "Nash Holdings",
+   "categoryID": "news",
+   "brand": null,
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "washington post"
+   ],
+   "popularity": 24
+  },
+  {
+   "id": "the-athletic",
+   "name": "The Athletic",
+   "vendor": "The New York Times",
+   "categoryID": "news",
+   "brand": "the-athletic",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "medium",
+   "name": "Medium",
+   "vendor": "Medium",
+   "categoryID": "news",
+   "brand": "medium",
+   "style": "color",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 44
+  },
+  {
+   "id": "substack",
+   "name": "Substack",
+   "vendor": "Substack",
+   "categoryID": "news",
+   "brand": "substack",
+   "style": "mono",
+   "hex": "#FF6719",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "readwise",
+   "name": "Readwise",
+   "vendor": "Readwise",
+   "categoryID": "news",
+   "brand": "readwise",
+   "style": "mono",
+   "hex": "#1B1B1B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "pocket",
+   "name": "Pocket Premium",
+   "vendor": "Mozilla",
+   "categoryID": "news",
+   "brand": "pocket",
+   "style": "mono",
+   "hex": "#EF4056",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "instapaper",
+   "name": "Instapaper",
+   "vendor": "Instapaper",
+   "categoryID": "news",
+   "brand": "instapaper",
+   "style": "mono",
+   "hex": "#1F1F1F",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "kindle-unlimited",
+   "name": "Kindle Unlimited",
+   "vendor": "Amazon",
+   "categoryID": "news",
+   "brand": "kindle-unlimited",
+   "style": "mono",
+   "hex": "#FF9900",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "kindle"
+   ],
+   "popularity": 48
+  },
+  {
+   "id": "scribd",
+   "name": "Scribd",
+   "vendor": "Everand",
+   "categoryID": "news",
+   "brand": "scribd",
+   "style": "mono",
+   "hex": "#1E7B85",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "blinkist",
+   "name": "Blinkist",
+   "vendor": "Blinks Labs",
+   "categoryID": "news",
+   "brand": "blinkist",
+   "style": "mono",
+   "hex": "#2CE080",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 20
+  },
+  {
+   "id": "weread",
+   "name": "微信读书",
+   "vendor": "腾讯",
+   "categoryID": "news",
+   "brand": "weread",
+   "style": "mono",
+   "hex": "#1AAD19",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "读书卡"
+   ],
+   "popularity": 80
+  },
+  {
+   "id": "dedao",
+   "name": "得到",
+   "vendor": "罗辑思维",
+   "categoryID": "news",
+   "brand": null,
+   "style": "mono",
+   "hex": "#E4393C",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "dedao"
+   ],
+   "popularity": 36
+  },
+  {
+   "id": "zhihu",
+   "name": "知乎盐选",
+   "vendor": "知乎",
+   "categoryID": "news",
+   "brand": "zhihu",
+   "style": "mono",
+   "hex": "#0084FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "zhihu"
+   ],
+   "popularity": 44
+  },
+  {
+   "id": "fanqie",
+   "name": "番茄小说",
+   "vendor": "字节跳动",
+   "categoryID": "news",
+   "brand": "fanqie",
+   "style": "mono",
+   "hex": "#FF6A00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "fanqie"
+   ],
+   "popularity": 38
+  },
+  {
+   "id": "ps-plus",
+   "name": "PlayStation Plus",
+   "vendor": "Sony",
+   "categoryID": "games",
+   "brand": "ps-plus",
+   "style": "mono",
+   "hex": "#0070D1",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "psn",
+    "ps会员"
+   ],
+   "popularity": 58
+  },
+  {
+   "id": "gamepass",
+   "name": "Xbox Game Pass",
+   "vendor": "Microsoft",
+   "categoryID": "games",
+   "brand": "gamepass",
+   "style": "mono",
+   "hex": "#107C10",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "xgp"
+   ],
+   "popularity": 62
+  },
+  {
+   "id": "nso",
+   "name": "Nintendo Switch Online",
+   "vendor": "Nintendo",
+   "categoryID": "games",
+   "brand": "nso",
+   "style": "mono",
+   "hex": "#E60012",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "ns会员",
+    "nso"
+   ],
+   "popularity": 50
+  },
+  {
+   "id": "ea-play",
+   "name": "EA Play",
+   "vendor": "Electronic Arts",
+   "categoryID": "games",
+   "brand": "ea-play",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 32
+  },
+  {
+   "id": "ubisoft-plus",
+   "name": "Ubisoft+",
+   "vendor": "Ubisoft",
+   "categoryID": "games",
+   "brand": "ubisoft-plus",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "geforce-now",
+   "name": "GeForce NOW",
+   "vendor": "NVIDIA",
+   "categoryID": "games",
+   "brand": "geforce-now",
+   "style": "mono",
+   "hex": "#76B900",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "apple-arcade",
+   "name": "Apple Arcade",
+   "vendor": "Apple",
+   "categoryID": "games",
+   "brand": "apple-arcade",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 42
+  },
+  {
+   "id": "google-play-pass",
+   "name": "Google Play Pass",
+   "vendor": "Google",
+   "categoryID": "games",
+   "brand": "google-play-pass",
+   "style": "mono",
+   "hex": "#414141",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "roblox",
+   "name": "Roblox Premium",
+   "vendor": "Roblox",
+   "categoryID": "games",
+   "brand": "roblox",
+   "style": "mono",
+   "hex": "#000000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 36
+  },
+  {
+   "id": "minecraft",
+   "name": "Minecraft Realms",
+   "vendor": "Mojang",
+   "categoryID": "games",
+   "brand": "minecraft",
+   "style": "color",
+   "hex": "#62B47A",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "duolingo",
+   "name": "Duolingo Super",
+   "vendor": "Duolingo",
+   "categoryID": "education",
+   "brand": "duolingo",
+   "style": "color",
+   "hex": "#58CC02",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "多邻国"
+   ],
+   "popularity": 56
+  },
+  {
+   "id": "coursera",
+   "name": "Coursera Plus",
+   "vendor": "Coursera",
+   "categoryID": "education",
+   "brand": "coursera",
+   "style": "mono",
+   "hex": "#0056D2",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "skillshare",
+   "name": "Skillshare",
+   "vendor": "Skillshare",
+   "categoryID": "education",
+   "brand": "skillshare",
+   "style": "mono",
+   "hex": "#00FF84",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 26
+  },
+  {
+   "id": "masterclass",
+   "name": "MasterClass",
+   "vendor": "MasterClass",
+   "categoryID": "education",
+   "brand": null,
+   "style": "mono",
+   "hex": "#E4002B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "brilliant",
+   "name": "Brilliant",
+   "vendor": "Brilliant",
+   "categoryID": "education",
+   "brand": "brilliant",
+   "style": "mono",
+   "hex": "#3E6DF5",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "babbel",
+   "name": "Babbel",
+   "vendor": "Babbel",
+   "categoryID": "education",
+   "brand": "babbel",
+   "style": "mono",
+   "hex": "#FF7300",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "rosetta-stone",
+   "name": "Rosetta Stone",
+   "vendor": "IXL Learning",
+   "categoryID": "education",
+   "brand": "rosetta-stone",
+   "style": "mono",
+   "hex": "#154B8B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 20
+  },
+  {
+   "id": "amazon-prime",
+   "name": "Amazon Prime",
+   "vendor": "Amazon",
+   "categoryID": "life",
+   "brand": "amazon-prime",
+   "style": "color",
+   "hex": "#FF9900",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "prime"
+   ],
+   "popularity": 76
+  },
+  {
+   "id": "costco",
+   "name": "Costco 会员",
+   "vendor": "Costco",
+   "categoryID": "life",
+   "brand": "costco",
+   "style": "color",
+   "hex": "#E31837",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "开市客"
+   ],
+   "popularity": 34
+  },
+  {
+   "id": "sams-club",
+   "name": "山姆会员店",
+   "vendor": "Walmart",
+   "categoryID": "life",
+   "brand": "sams-club",
+   "style": "mono",
+   "hex": "#0067A0",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "sams club",
+    "山姆"
+   ],
+   "popularity": 40
+  },
+  {
+   "id": "walmart-plus",
+   "name": "Walmart+",
+   "vendor": "Walmart",
+   "categoryID": "life",
+   "brand": "walmart-plus",
+   "style": "mono",
+   "hex": "#0071CE",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 24
+  },
+  {
+   "id": "jd-plus",
+   "name": "京东 PLUS",
+   "vendor": "京东",
+   "categoryID": "life",
+   "brand": "jd-plus",
+   "style": "mono",
+   "hex": "#E1251B",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "jd",
+    "京东会员"
+   ],
+   "popularity": 62
+  },
+  {
+   "id": "taobao-88vip",
+   "name": "淘宝 88VIP",
+   "vendor": "阿里巴巴",
+   "categoryID": "life",
+   "brand": "taobao-88vip",
+   "style": "mono",
+   "hex": "#FF5000",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "88vip",
+    "淘宝会员"
+   ],
+   "popularity": 64
+  },
+  {
+   "id": "meituan",
+   "name": "美团会员",
+   "vendor": "美团",
+   "categoryID": "life",
+   "brand": "meituan",
+   "style": "mono",
+   "hex": "#FFD100",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "美团外卖会员"
+   ],
+   "popularity": 52
+  },
+  {
+   "id": "eleme",
+   "name": "饿了么会员",
+   "vendor": "阿里巴巴",
+   "categoryID": "life",
+   "brand": "eleme",
+   "style": "mono",
+   "hex": "#0084FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "ele.me"
+   ],
+   "popularity": 40
+  },
+  {
+   "id": "didi",
+   "name": "滴滴会员",
+   "vendor": "滴滴出行",
+   "categoryID": "life",
+   "brand": "didi",
+   "style": "mono",
+   "hex": "#FF7F00",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "didi"
+   ],
+   "popularity": 38
+  },
+  {
+   "id": "hellobike",
+   "name": "哈啰骑行卡",
+   "vendor": "哈啰",
+   "categoryID": "life",
+   "brand": "hellobike",
+   "style": "mono",
+   "hex": "#00B4FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "哈啰"
+   ],
+   "popularity": 26
+  },
+  {
+   "id": "xinghe",
+   "name": "星巴克会员",
+   "vendor": "Starbucks",
+   "categoryID": "life",
+   "brand": "xinghe",
+   "style": "mono",
+   "hex": "#00704A",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "starbucks"
+   ],
+   "popularity": 30
+  },
+  {
+   "id": "pinduoduo",
+   "name": "拼多多省钱月卡",
+   "vendor": "拼多多",
+   "categoryID": "life",
+   "brand": "pinduoduo",
+   "style": "mono",
+   "hex": "#E02E24",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "pdd"
+   ],
+   "popularity": 36
+  },
+  {
+   "id": "xiaohongshu",
+   "name": "小红书会员",
+   "vendor": "小红书",
+   "categoryID": "life",
+   "brand": "xiaohongshu",
+   "style": "mono",
+   "hex": "#FF2442",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "rednote"
+   ],
+   "popularity": 32
+  },
+  {
+   "id": "nordvpn",
+   "name": "NordVPN",
+   "vendor": "Nord Security",
+   "categoryID": "security",
+   "brand": "nordvpn",
+   "style": "color",
+   "hex": "#4687FF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 40
+  },
+  {
+   "id": "expressvpn",
+   "name": "ExpressVPN",
+   "vendor": "ExpressVPN",
+   "categoryID": "security",
+   "brand": "expressvpn",
+   "style": "color",
+   "hex": "#DA3940",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 38
+  },
+  {
+   "id": "surfshark",
+   "name": "Surfshark",
+   "vendor": "Surfshark",
+   "categoryID": "security",
+   "brand": "surfshark",
+   "style": "color",
+   "hex": "#1EBFBF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 30
+  },
+  {
+   "id": "proton",
+   "name": "Proton Unlimited",
+   "vendor": "Proton",
+   "categoryID": "security",
+   "brand": "proton",
+   "style": "color",
+   "hex": "#6D4AFF",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 34
+  },
+  {
+   "id": "mullvad",
+   "name": "Mullvad VPN",
+   "vendor": "Mullvad",
+   "categoryID": "security",
+   "brand": "mullvad",
+   "style": "color",
+   "hex": "#294D73",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 20
+  },
+  {
+   "id": "china-mobile",
+   "name": "中国移动套餐",
+   "vendor": "中国移动",
+   "categoryID": "life",
+   "brand": "china-mobile",
+   "style": "mono",
+   "hex": "#0079C1",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "移动",
+    "china mobile"
+   ],
+   "popularity": 50
+  },
+  {
+   "id": "china-unicom",
+   "name": "中国联通套餐",
+   "vendor": "中国联通",
+   "categoryID": "life",
+   "brand": "china-unicom",
+   "style": "mono",
+   "hex": "#E60012",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "联通",
+    "china unicom"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "china-telecom",
+   "name": "中国电信套餐",
+   "vendor": "中国电信",
+   "categoryID": "life",
+   "brand": "china-telecom",
+   "style": "mono",
+   "hex": "#005BAC",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "电信",
+    "china telecom"
+   ],
+   "popularity": 42
+  },
+  {
+   "id": "tinder",
+   "name": "Tinder Gold",
+   "vendor": "Match Group",
+   "categoryID": "life",
+   "brand": "tinder",
+   "style": "mono",
+   "hex": "#FE3C72",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 32
+  },
+  {
+   "id": "bumble",
+   "name": "Bumble Premium",
+   "vendor": "Bumble",
+   "categoryID": "life",
+   "brand": "bumble",
+   "style": "mono",
+   "hex": "#FFC629",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [],
+   "popularity": 22
+  },
+  {
+   "id": "linkedin",
+   "name": "LinkedIn Premium",
+   "vendor": "Microsoft",
+   "categoryID": "software",
+   "brand": "linkedin",
+   "style": "color",
+   "hex": "#0A66C2",
+   "symbol": "creditcard.fill",
+   "defaultCycle": {
+    "kind": "monthly"
+   },
+   "aliases": [
+    "领英"
+   ],
+   "popularity": 34
+  }
+ ]
+}
