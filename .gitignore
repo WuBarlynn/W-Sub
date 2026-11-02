@@ -25,3 +25,4 @@ Payload/
 
 # SwiftPM
 .build/
+checksum.txt
