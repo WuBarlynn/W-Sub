@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "kindle-unlimited.svg",
+      "filename": "kindle-unlimited.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

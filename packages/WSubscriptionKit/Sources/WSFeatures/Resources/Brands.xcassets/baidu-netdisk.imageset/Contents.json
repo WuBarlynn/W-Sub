@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "baidu-netdisk.svg",
+      "filename": "baidu-netdisk.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

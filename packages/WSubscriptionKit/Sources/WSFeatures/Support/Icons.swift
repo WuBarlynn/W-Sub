@@ -36,8 +36,9 @@ public struct IconTile: View {
 
     public var body: some View {
         ZStack {
+            // 底色始终铺品牌色：全彩图自带留白时不会露出白缝
+            shape.fill(tint)
             if let customID, let image = IconStore.shared.image(id: customID) {
-                shape.fill(Color(hex: hex))
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -45,25 +46,25 @@ public struct IconTile: View {
                     .clipShape(shape)
             } else if let brand, BrandAssets.has(brand) {
                 if isFullColor {
+                    // 源图已规整为正方形画布，等比铺满不会裁掉任何内容
                     Image(brand, bundle: .module)
                         .resizable()
                         .scaledToFill()
                         .frame(width: size, height: size)
+                        .clipped()
                         .clipShape(shape)
                 } else {
-                    shape.fill(tint)
                     Image(brand, bundle: .module)
                         .resizable()
                         .scaledToFit()
                         .padding(size * 0.22)
+                        .frame(width: size, height: size)
                 }
             } else if !symbol.isEmpty, UIImage(systemName: symbol) != nil {
-                shape.fill(tint)
                 Image(systemName: symbol)
                     .font(.system(size: size * 0.40, weight: .medium))
                     .foregroundStyle(.white)
             } else {
-                shape.fill(tint)
                 Text(monogram)
                     .font(.system(size: size * 0.40, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
@@ -228,6 +229,7 @@ public struct BrandOption: Identifiable, Hashable, Sendable {
     public let id: String
     public let name: String
     public let hex: String
+    public let tile: String
     public let style: String
     public let category: String
 }
@@ -236,7 +238,7 @@ public enum BrandCatalog {
     public static let all: [BrandOption] = TemplateCatalog.all.compactMap { template in
         guard let brand = template.brand, BrandAssets.has(brand) else { return nil }
         return BrandOption(id: brand, name: template.name, hex: template.hex,
-                           style: template.style, category: template.categoryID)
+                           tile: template.tile, style: template.style, category: template.categoryID)
     }
 
     private static let styles: [String: String] = Dictionary(

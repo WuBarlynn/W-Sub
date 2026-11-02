@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "didi.svg",
+      "filename": "didi.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

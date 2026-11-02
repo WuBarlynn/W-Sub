@@ -8,6 +8,7 @@
    "brand": "netflix",
    "style": "color",
    "hex": "#E50914",
+   "tile": "#141414",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -26,6 +27,7 @@
    "brand": "disney-plus",
    "style": "color",
    "hex": "#113CCF",
+   "tile": "#0E1B4D",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -43,6 +45,7 @@
    "brand": "hulu",
    "style": "color",
    "hex": "#1CE783",
+   "tile": "#1CE783",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -58,6 +61,7 @@
    "brand": "max",
    "style": "color",
    "hex": "#002BE7",
+   "tile": "#002BE7",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -76,6 +80,7 @@
    "brand": "prime-video",
    "style": "color",
    "hex": "#00A8E1",
+   "tile": "#0F171E",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -93,6 +98,7 @@
    "brand": "apple-tv-plus",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -108,6 +114,7 @@
    "brand": "paramount-plus",
    "style": "color",
    "hex": "#0064FF",
+   "tile": "#0064FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -123,6 +130,7 @@
    "brand": "peacock",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -138,6 +146,7 @@
    "brand": "youtube-premium",
    "style": "color",
    "hex": "#FF0000",
+   "tile": "#FF0000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -155,6 +164,7 @@
    "brand": "twitch",
    "style": "color",
    "hex": "#9146FF",
+   "tile": "#9146FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -170,6 +180,7 @@
    "brand": "crunchyroll",
    "style": "color",
    "hex": "#F47521",
+   "tile": "#F47521",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -185,6 +196,7 @@
    "brand": "vimeo",
    "style": "color",
    "hex": "#1AB7EA",
+   "tile": "#1AB7EA",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -200,6 +212,7 @@
    "brand": "mubi",
    "style": "color",
    "hex": "#001489",
+   "tile": "#001489",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -215,6 +228,7 @@
    "brand": "nebula",
    "style": "color",
    "hex": "#1B1B1B",
+   "tile": "#1B1B1B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -230,6 +244,7 @@
    "brand": "iqiyi",
    "style": "mono",
    "hex": "#00BE06",
+   "tile": "#00BE06",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -248,6 +263,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#FF6022",
+   "tile": "#FF6022",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -266,6 +282,7 @@
    "brand": "youku",
    "style": "mono",
    "hex": "#1BA6E2",
+   "tile": "#1BA6E2",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -284,6 +301,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#FF6B00",
+   "tile": "#FF6B00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -302,6 +320,7 @@
    "brand": "bilibili",
    "style": "color",
    "hex": "#FB7299",
+   "tile": "#FB7299",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -321,6 +340,7 @@
    "brand": "migu",
    "style": "mono",
    "hex": "#E60012",
+   "tile": "#E60012",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -338,6 +358,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#FF3300",
+   "tile": "#FF3300",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -355,6 +376,7 @@
    "brand": "douyin",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -373,6 +395,7 @@
    "brand": "spotify",
    "style": "color",
    "hex": "#1DB954",
+   "tile": "#1DB954",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -390,6 +413,7 @@
    "brand": "apple-music",
    "style": "color",
    "hex": "#FA243C",
+   "tile": "#FA243C",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -407,6 +431,7 @@
    "brand": "youtube-music",
    "style": "color",
    "hex": "#FF0000",
+   "tile": "#FF0000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -422,6 +447,7 @@
    "brand": "amazon-music",
    "style": "mono",
    "hex": "#25D1DA",
+   "tile": "#25D1DA",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -437,6 +463,7 @@
    "brand": "tidal",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -452,6 +479,7 @@
    "brand": "deezer",
    "style": "color",
    "hex": "#A238FF",
+   "tile": "#A238FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -467,6 +495,7 @@
    "brand": "soundcloud",
    "style": "color",
    "hex": "#FF5500",
+   "tile": "#FF5500",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -482,6 +511,7 @@
    "brand": "audible",
    "style": "mono",
    "hex": "#F8991C",
+   "tile": "#F8991C",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -499,6 +529,7 @@
    "brand": "netease-music",
    "style": "mono",
    "hex": "#C20C0C",
+   "tile": "#C20C0C",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -517,6 +548,7 @@
    "brand": "qq-music",
    "style": "mono",
    "hex": "#31C27C",
+   "tile": "#31C27C",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -535,6 +567,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#2CA2F9",
+   "tile": "#2CA2F9",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -552,6 +585,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#FFCC00",
+   "tile": "#FFCC00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -569,6 +603,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#F86442",
+   "tile": "#F86442",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -586,6 +621,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#00A0E9",
+   "tile": "#00A0E9",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -603,6 +639,7 @@
    "brand": "siriusxm",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -618,6 +655,7 @@
    "brand": "adobe-cc",
    "style": "mono",
    "hex": "#FA0F00",
+   "tile": "#FA0F00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -637,6 +675,7 @@
    "brand": "microsoft-365",
    "style": "color",
    "hex": "#D83B01",
+   "tile": "#D83B01",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -655,6 +694,7 @@
    "brand": "notion",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -670,6 +710,7 @@
    "brand": "evernote",
    "style": "color",
    "hex": "#00A82D",
+   "tile": "#00A82D",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -687,6 +728,7 @@
    "brand": "todoist",
    "style": "color",
    "hex": "#E44332",
+   "tile": "#E44332",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -702,6 +744,7 @@
    "brand": "obsidian",
    "style": "color",
    "hex": "#7C3AED",
+   "tile": "#7C3AED",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -717,6 +760,7 @@
    "brand": "setapp",
    "style": "mono",
    "hex": "#6C4BF4",
+   "tile": "#6C4BF4",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -732,6 +776,7 @@
    "brand": "1password",
    "style": "color",
    "hex": "#1A8CFF",
+   "tile": "#1A8CFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -749,6 +794,7 @@
    "brand": "bitwarden",
    "style": "color",
    "hex": "#175DDC",
+   "tile": "#175DDC",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -764,6 +810,7 @@
    "brand": "dashlane",
    "style": "mono",
    "hex": "#0E353D",
+   "tile": "#0E353D",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -779,6 +826,7 @@
    "brand": "grammarly",
    "style": "mono",
    "hex": "#15C39A",
+   "tile": "#15C39A",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -794,6 +842,7 @@
    "brand": "deepl",
    "style": "color",
    "hex": "#0F2B46",
+   "tile": "#0F2B46",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -809,6 +858,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#F5A623",
+   "tile": "#F5A623",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -824,6 +874,7 @@
    "brand": "parallels",
    "style": "color",
    "hex": "#1F5FA9",
+   "tile": "#1F5FA9",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -839,6 +890,7 @@
    "brand": "sketch",
    "style": "mono",
    "hex": "#F7B500",
+   "tile": "#F7B500",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -854,6 +906,7 @@
    "brand": "figma",
    "style": "color",
    "hex": "#A259FF",
+   "tile": "#A259FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -869,6 +922,7 @@
    "brand": "canva",
    "style": "mono",
    "hex": "#00C4CC",
+   "tile": "#00C4CC",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -884,6 +938,7 @@
    "brand": "capcut",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -901,6 +956,7 @@
    "brand": "affinity",
    "style": "mono",
    "hex": "#1B72BE",
+   "tile": "#1B72BE",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -916,6 +972,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#4B4B4B",
+   "tile": "#4B4B4B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -931,6 +988,7 @@
    "brand": "wps",
    "style": "mono",
    "hex": "#E64C3D",
+   "tile": "#E64C3D",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -948,6 +1006,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#3370FF",
+   "tile": "#3370FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -966,6 +1025,7 @@
    "brand": "dingtalk",
    "style": "mono",
    "hex": "#0089FF",
+   "tile": "#0089FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -983,6 +1043,7 @@
    "brand": "slack",
    "style": "color",
    "hex": "#4A154B",
+   "tile": "#4A154B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -998,6 +1059,7 @@
    "brand": "zoom",
    "style": "color",
    "hex": "#2D8CFF",
+   "tile": "#2D8CFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1013,6 +1075,7 @@
    "brand": "google-workspace",
    "style": "color",
    "hex": "#4285F4",
+   "tile": "#4285F4",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1030,6 +1093,7 @@
    "brand": "miro",
    "style": "color",
    "hex": "#FFD02F",
+   "tile": "#FFD02F",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1045,6 +1109,7 @@
    "brand": "airtable",
    "style": "color",
    "hex": "#18BFFF",
+   "tile": "#18BFFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1060,6 +1125,7 @@
    "brand": "monday",
    "style": "color",
    "hex": "#FF3D57",
+   "tile": "#FF3D57",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1075,6 +1141,7 @@
    "brand": "clickup",
    "style": "color",
    "hex": "#7B68EE",
+   "tile": "#7B68EE",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1090,6 +1157,7 @@
    "brand": "asana",
    "style": "color",
    "hex": "#F06A6A",
+   "tile": "#F06A6A",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1105,6 +1173,7 @@
    "brand": "icloud-plus",
    "style": "mono",
    "hex": "#3B99FC",
+   "tile": "#3B99FC",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1123,6 +1192,7 @@
    "brand": "google-one",
    "style": "color",
    "hex": "#4285F4",
+   "tile": "#4285F4",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1141,6 +1211,7 @@
    "brand": "onedrive",
    "style": "mono",
    "hex": "#0364B8",
+   "tile": "#0364B8",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1156,6 +1227,7 @@
    "brand": "dropbox",
    "style": "color",
    "hex": "#0061FF",
+   "tile": "#0061FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1171,6 +1243,7 @@
    "brand": "box",
    "style": "color",
    "hex": "#0061D5",
+   "tile": "#0061D5",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1186,6 +1259,7 @@
    "brand": "pcloud",
    "style": "color",
    "hex": "#1CB4F0",
+   "tile": "#1CB4F0",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1201,6 +1275,7 @@
    "brand": "mega",
    "style": "mono",
    "hex": "#D9272E",
+   "tile": "#D9272E",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1216,6 +1291,7 @@
    "brand": "baidu-netdisk",
    "style": "mono",
    "hex": "#2468F2",
+   "tile": "#2468F2",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1234,6 +1310,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#6E5BFF",
+   "tile": "#6E5BFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1251,6 +1328,7 @@
    "brand": "quark",
    "style": "mono",
    "hex": "#2B6EF3",
+   "tile": "#2B6EF3",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1266,6 +1344,7 @@
    "brand": "xunlei",
    "style": "mono",
    "hex": "#0E7BFF",
+   "tile": "#0E7BFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1283,6 +1362,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#2F7BFF",
+   "tile": "#2F7BFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1298,6 +1378,7 @@
    "brand": "chatgpt",
    "style": "color",
    "hex": "#10A37F",
+   "tile": "#0D0D0D",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1316,6 +1397,7 @@
    "brand": "claude",
    "style": "color",
    "hex": "#D97757",
+   "tile": "#F0EEE6",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1333,6 +1415,7 @@
    "brand": "gemini",
    "style": "mono",
    "hex": "#4285F4",
+   "tile": "#4285F4",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1350,6 +1433,7 @@
    "brand": "copilot",
    "style": "mono",
    "hex": "#24292F",
+   "tile": "#24292F",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1367,6 +1451,7 @@
    "brand": "cursor",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1382,6 +1467,7 @@
    "brand": "midjourney",
    "style": "color",
    "hex": "#1B1B3A",
+   "tile": "#1B1B3A",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1400,6 +1486,7 @@
    "brand": "perplexity",
    "style": "color",
    "hex": "#1FB8CD",
+   "tile": "#1FB8CD",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1415,6 +1502,7 @@
    "brand": "poe",
    "style": "mono",
    "hex": "#5D5CDE",
+   "tile": "#5D5CDE",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1430,6 +1518,7 @@
    "brand": "character-ai",
    "style": "mono",
    "hex": "#1E1E1E",
+   "tile": "#1E1E1E",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1445,6 +1534,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1460,6 +1550,7 @@
    "brand": "elevenlabs",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1475,6 +1566,7 @@
    "brand": "suno",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1490,6 +1582,7 @@
    "brand": "replit",
    "style": "mono",
    "hex": "#F26207",
+   "tile": "#F26207",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1505,6 +1598,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#09B6A2",
+   "tile": "#09B6A2",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1520,6 +1614,7 @@
    "brand": "deepseek",
    "style": "color",
    "hex": "#4D6BFE",
+   "tile": "#4D6BFE",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1535,6 +1630,7 @@
    "brand": "kimi",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1552,6 +1648,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#3B6EF6",
+   "tile": "#3B6EF6",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1567,6 +1664,7 @@
    "brand": "tongyi",
    "style": "mono",
    "hex": "#615CED",
+   "tile": "#615CED",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1584,6 +1682,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#2932E1",
+   "tile": "#2932E1",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1601,6 +1700,7 @@
    "brand": "grok",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1616,6 +1716,7 @@
    "brand": "mistral",
    "style": "color",
    "hex": "#FA520F",
+   "tile": "#FA520F",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1631,6 +1732,7 @@
    "brand": "huggingface",
    "style": "color",
    "hex": "#FFD21E",
+   "tile": "#FFD21E",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1646,6 +1748,7 @@
    "brand": "apple-fitness",
    "style": "mono",
    "hex": "#30D158",
+   "tile": "#30D158",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1663,6 +1766,7 @@
    "brand": "peloton",
    "style": "mono",
    "hex": "#DF1C2F",
+   "tile": "#DF1C2F",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1678,6 +1782,7 @@
    "brand": "strava",
    "style": "color",
    "hex": "#FC4C02",
+   "tile": "#FC4C02",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1693,6 +1798,7 @@
    "brand": "nike-training",
    "style": "mono",
    "hex": "#111111",
+   "tile": "#111111",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1708,6 +1814,7 @@
    "brand": "keep",
    "style": "mono",
    "hex": "#1FB6C9",
+   "tile": "#1FB6C9",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1725,6 +1832,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#0E7C86",
+   "tile": "#0E7C86",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1740,6 +1848,7 @@
    "brand": "myfitnesspal",
    "style": "mono",
    "hex": "#0072FF",
+   "tile": "#0072FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1755,6 +1864,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#FF6B00",
+   "tile": "#FF6B00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1770,6 +1880,7 @@
    "brand": "whoop",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1785,6 +1896,7 @@
    "brand": "oura",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1800,6 +1912,7 @@
    "brand": "fitbit",
    "style": "mono",
    "hex": "#00B0B9",
+   "tile": "#00B0B9",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1815,6 +1928,7 @@
    "brand": "zwift",
    "style": "mono",
    "hex": "#FC6719",
+   "tile": "#FC6719",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1830,6 +1944,7 @@
    "brand": "headspace",
    "style": "mono",
    "hex": "#F47D31",
+   "tile": "#F47D31",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1845,6 +1960,7 @@
    "brand": "calm",
    "style": "mono",
    "hex": "#2E7CD6",
+   "tile": "#2E7CD6",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1860,6 +1976,7 @@
    "brand": "betterhelp",
    "style": "mono",
    "hex": "#3A7D44",
+   "tile": "#3A7D44",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1875,6 +1992,7 @@
    "brand": "nyt",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1893,6 +2011,7 @@
    "brand": "wsj",
    "style": "mono",
    "hex": "#0274B6",
+   "tile": "#0274B6",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1911,6 +2030,7 @@
    "brand": "economist",
    "style": "mono",
    "hex": "#E3120B",
+   "tile": "#E3120B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1928,6 +2048,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1943,6 +2064,7 @@
    "brand": "ft",
    "style": "mono",
    "hex": "#FFF1E5",
+   "tile": "#FFF1E5",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1961,6 +2083,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1978,6 +2101,7 @@
    "brand": "the-athletic",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -1993,6 +2117,7 @@
    "brand": "medium",
    "style": "color",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2008,6 +2133,7 @@
    "brand": "substack",
    "style": "mono",
    "hex": "#FF6719",
+   "tile": "#FF6719",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2023,6 +2149,7 @@
    "brand": "readwise",
    "style": "mono",
    "hex": "#1B1B1B",
+   "tile": "#1B1B1B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2038,6 +2165,7 @@
    "brand": "pocket",
    "style": "mono",
    "hex": "#EF4056",
+   "tile": "#EF4056",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2053,6 +2181,7 @@
    "brand": "instapaper",
    "style": "mono",
    "hex": "#1F1F1F",
+   "tile": "#1F1F1F",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2068,6 +2197,7 @@
    "brand": "kindle-unlimited",
    "style": "mono",
    "hex": "#FF9900",
+   "tile": "#FF9900",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2085,6 +2215,7 @@
    "brand": "scribd",
    "style": "mono",
    "hex": "#1E7B85",
+   "tile": "#1E7B85",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2100,6 +2231,7 @@
    "brand": "blinkist",
    "style": "mono",
    "hex": "#2CE080",
+   "tile": "#2CE080",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2115,6 +2247,7 @@
    "brand": "weread",
    "style": "mono",
    "hex": "#1AAD19",
+   "tile": "#1AAD19",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2132,6 +2265,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#E4393C",
+   "tile": "#E4393C",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2149,6 +2283,7 @@
    "brand": "zhihu",
    "style": "mono",
    "hex": "#0084FF",
+   "tile": "#0084FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2166,6 +2301,7 @@
    "brand": "fanqie",
    "style": "mono",
    "hex": "#FF6A00",
+   "tile": "#FF6A00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2183,6 +2319,7 @@
    "brand": "ps-plus",
    "style": "mono",
    "hex": "#0070D1",
+   "tile": "#0070D1",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2201,6 +2338,7 @@
    "brand": "gamepass",
    "style": "mono",
    "hex": "#107C10",
+   "tile": "#107C10",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2218,6 +2356,7 @@
    "brand": "nso",
    "style": "mono",
    "hex": "#E60012",
+   "tile": "#E60012",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2236,6 +2375,7 @@
    "brand": "ea-play",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2251,6 +2391,7 @@
    "brand": "ubisoft-plus",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2266,6 +2407,7 @@
    "brand": "geforce-now",
    "style": "mono",
    "hex": "#76B900",
+   "tile": "#76B900",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2281,6 +2423,7 @@
    "brand": "apple-arcade",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2296,6 +2439,7 @@
    "brand": "google-play-pass",
    "style": "mono",
    "hex": "#414141",
+   "tile": "#414141",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2311,6 +2455,7 @@
    "brand": "roblox",
    "style": "mono",
    "hex": "#000000",
+   "tile": "#000000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2326,6 +2471,7 @@
    "brand": "minecraft",
    "style": "color",
    "hex": "#62B47A",
+   "tile": "#62B47A",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2341,6 +2487,7 @@
    "brand": "duolingo",
    "style": "color",
    "hex": "#58CC02",
+   "tile": "#58CC02",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2358,6 +2505,7 @@
    "brand": "coursera",
    "style": "mono",
    "hex": "#0056D2",
+   "tile": "#0056D2",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2373,6 +2521,7 @@
    "brand": "skillshare",
    "style": "mono",
    "hex": "#00FF84",
+   "tile": "#00FF84",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2388,6 +2537,7 @@
    "brand": null,
    "style": "mono",
    "hex": "#E4002B",
+   "tile": "#E4002B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2403,6 +2553,7 @@
    "brand": "brilliant",
    "style": "mono",
    "hex": "#3E6DF5",
+   "tile": "#3E6DF5",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2418,6 +2569,7 @@
    "brand": "babbel",
    "style": "mono",
    "hex": "#FF7300",
+   "tile": "#FF7300",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2433,6 +2585,7 @@
    "brand": "rosetta-stone",
    "style": "mono",
    "hex": "#154B8B",
+   "tile": "#154B8B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2448,6 +2601,7 @@
    "brand": "amazon-prime",
    "style": "color",
    "hex": "#FF9900",
+   "tile": "#FF9900",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2465,6 +2619,7 @@
    "brand": "costco",
    "style": "color",
    "hex": "#E31837",
+   "tile": "#E31837",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2482,6 +2637,7 @@
    "brand": "sams-club",
    "style": "mono",
    "hex": "#0067A0",
+   "tile": "#0067A0",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2500,6 +2656,7 @@
    "brand": "walmart-plus",
    "style": "mono",
    "hex": "#0071CE",
+   "tile": "#0071CE",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2515,6 +2672,7 @@
    "brand": "jd-plus",
    "style": "mono",
    "hex": "#E1251B",
+   "tile": "#E1251B",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2533,6 +2691,7 @@
    "brand": "taobao-88vip",
    "style": "mono",
    "hex": "#FF5000",
+   "tile": "#FF5000",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2551,6 +2710,7 @@
    "brand": "meituan",
    "style": "mono",
    "hex": "#FFD100",
+   "tile": "#FFD100",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2568,6 +2728,7 @@
    "brand": "eleme",
    "style": "mono",
    "hex": "#0084FF",
+   "tile": "#0084FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2585,6 +2746,7 @@
    "brand": "didi",
    "style": "mono",
    "hex": "#FF7F00",
+   "tile": "#FF7F00",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2602,6 +2764,7 @@
    "brand": "hellobike",
    "style": "mono",
    "hex": "#00B4FF",
+   "tile": "#00B4FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2619,6 +2782,7 @@
    "brand": "xinghe",
    "style": "mono",
    "hex": "#00704A",
+   "tile": "#00704A",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2636,6 +2800,7 @@
    "brand": "pinduoduo",
    "style": "mono",
    "hex": "#E02E24",
+   "tile": "#E02E24",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2653,6 +2818,7 @@
    "brand": "xiaohongshu",
    "style": "mono",
    "hex": "#FF2442",
+   "tile": "#FF2442",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2670,6 +2836,7 @@
    "brand": "nordvpn",
    "style": "color",
    "hex": "#4687FF",
+   "tile": "#4687FF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2685,6 +2852,7 @@
    "brand": "expressvpn",
    "style": "color",
    "hex": "#DA3940",
+   "tile": "#DA3940",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2700,6 +2868,7 @@
    "brand": "surfshark",
    "style": "color",
    "hex": "#1EBFBF",
+   "tile": "#1EBFBF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2715,6 +2884,7 @@
    "brand": "proton",
    "style": "color",
    "hex": "#6D4AFF",
+   "tile": "#6D4AFF",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2730,6 +2900,7 @@
    "brand": "mullvad",
    "style": "color",
    "hex": "#294D73",
+   "tile": "#294D73",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2745,6 +2916,7 @@
    "brand": "china-mobile",
    "style": "mono",
    "hex": "#0079C1",
+   "tile": "#0079C1",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2763,6 +2935,7 @@
    "brand": "china-unicom",
    "style": "mono",
    "hex": "#E60012",
+   "tile": "#E60012",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2781,6 +2954,7 @@
    "brand": "china-telecom",
    "style": "mono",
    "hex": "#005BAC",
+   "tile": "#005BAC",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2799,6 +2973,7 @@
    "brand": "tinder",
    "style": "mono",
    "hex": "#FE3C72",
+   "tile": "#FE3C72",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2814,6 +2989,7 @@
    "brand": "bumble",
    "style": "mono",
    "hex": "#FFC629",
+   "tile": "#FFC629",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"
@@ -2829,6 +3005,7 @@
    "brand": "linkedin",
    "style": "color",
    "hex": "#0A66C2",
+   "tile": "#0A66C2",
    "symbol": "creditcard.fill",
    "defaultCycle": {
     "kind": "monthly"

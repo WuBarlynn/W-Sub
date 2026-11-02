@@ -93,7 +93,7 @@ struct IconPickerView: View {
                         dismiss()
                     } label: {
                         VStack(spacing: 6) {
-                            IconTile(brand: option.id, symbol: "", hex: option.hex, name: option.name, size: 50)
+                            IconTile(brand: option.id, symbol: "", hex: option.tile, name: option.name, size: 50)
                             Text(option.name)
                                 .font(.system(size: 10))
                                 .foregroundStyle(.secondary)

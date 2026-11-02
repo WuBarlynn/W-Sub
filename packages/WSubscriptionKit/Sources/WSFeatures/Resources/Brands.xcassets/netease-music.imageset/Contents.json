@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "netease-music.svg",
+      "filename": "netease-music.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

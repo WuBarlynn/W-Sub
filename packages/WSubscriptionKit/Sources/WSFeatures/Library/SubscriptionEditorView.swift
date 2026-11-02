@@ -38,7 +38,7 @@ struct SubscriptionEditorView: View {
                                                       price: .zero(currency),
                                                       cycle: template.defaultCycle,
                                                       symbolName: template.symbol,
-                                                      tintHex: template.hex,
+                                                      tintHex: template.tile,
                                                       brandID: template.brand))
             _amountText = State(initialValue: "")
             let (choice, months) = CycleChoice.from(template.defaultCycle)

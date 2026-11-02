@@ -6,14 +6,14 @@ icon 写法：logos:slug（全彩品牌标）、arc:slug（应用图标，着色
 
 SERVICES = [
     # ── 流媒体 ────────────────────────────────────────────────
-    {"id": "netflix", "name": "Netflix", "vendor": "Netflix", "category": "streaming", "hex": "#E50914", "popularity": 99, "aliases": ["奈飞", "网飞"], "icon": ["logos:netflix", "si:netflix"]},
-    {"id": "disney-plus", "name": "Disney+", "vendor": "Disney", "category": "streaming", "hex": "#113CCF", "popularity": 88, "aliases": ["迪士尼"], "icon": ["arc:disney"]},
+    {"tile": "#141414", "id": "netflix", "name": "Netflix", "vendor": "Netflix", "category": "streaming", "hex": "#E50914", "popularity": 99, "aliases": ["奈飞", "网飞"], "icon": ["logos:netflix", "si:netflix"]},
+    {"tile": "#0E1B4D", "id": "disney-plus", "name": "Disney+", "vendor": "Disney", "category": "streaming", "hex": "#113CCF", "popularity": 88, "aliases": ["迪士尼"], "icon": ["arc:disney"]},
     {"id": "hulu", "name": "Hulu", "vendor": "Disney", "category": "streaming", "hex": "#1CE783", "popularity": 72, "icon": ["si:hulu", "arc:hulu"]},
-    {"id": "max", "name": "Max", "vendor": "Warner Bros. Discovery", "category": "streaming", "hex": "#002BE7", "popularity": 66, "aliases": ["HBO", "HBO Max"], "icon": ["si:hbo", "arc:hbo-max"]},
-    {"id": "prime-video", "name": "Prime Video", "vendor": "Amazon", "category": "streaming", "hex": "#00A8E1", "popularity": 78, "aliases": ["亚马逊视频"], "icon": ["arc:amazon-prime-video", "si:amazon"]},
-    {"id": "apple-tv-plus", "name": "Apple TV+", "vendor": "Apple", "category": "streaming", "hex": "#000000", "popularity": 74, "icon": ["si:appletv", "arc:apple-tv"]},
-    {"id": "paramount-plus", "name": "Paramount+", "vendor": "Paramount", "category": "streaming", "hex": "#0064FF", "popularity": 54, "icon": ["si:paramountplus", "arc:paramount-plus"]},
-    {"id": "peacock", "name": "Peacock", "vendor": "NBCUniversal", "category": "streaming", "hex": "#000000", "popularity": 48, "icon": ["arc:peacock"]},
+    {"tile": "#002BE7", "id": "max", "name": "Max", "vendor": "Warner Bros. Discovery", "category": "streaming", "hex": "#002BE7", "popularity": 66, "aliases": ["HBO", "HBO Max"], "icon": ["si:hbo", "arc:hbo-max"]},
+    {"tile": "#0F171E", "id": "prime-video", "name": "Prime Video", "vendor": "Amazon", "category": "streaming", "hex": "#00A8E1", "popularity": 78, "aliases": ["亚马逊视频"], "icon": ["arc:amazon-prime-video", "si:amazon"]},
+    {"tile": "#000000", "id": "apple-tv-plus", "name": "Apple TV+", "vendor": "Apple", "category": "streaming", "hex": "#000000", "popularity": 74, "icon": ["si:appletv", "arc:apple-tv"]},
+    {"tile": "#0064FF", "id": "paramount-plus", "name": "Paramount+", "vendor": "Paramount", "category": "streaming", "hex": "#0064FF", "popularity": 54, "icon": ["si:paramountplus", "arc:paramount-plus"]},
+    {"tile": "#000000", "id": "peacock", "name": "Peacock", "vendor": "NBCUniversal", "category": "streaming", "hex": "#000000", "popularity": 48, "icon": ["arc:peacock"]},
     {"id": "youtube-premium", "name": "YouTube Premium", "vendor": "Google", "category": "streaming", "hex": "#FF0000", "popularity": 90, "aliases": ["油管会员"], "icon": ["logos:youtube-icon", "si:youtube"]},
     {"id": "twitch", "name": "Twitch", "vendor": "Amazon", "category": "streaming", "hex": "#9146FF", "popularity": 56, "icon": ["logos:twitch", "si:twitch"]},
     {"id": "crunchyroll", "name": "Crunchyroll", "vendor": "Sony", "category": "streaming", "hex": "#F47521", "popularity": 44, "icon": ["si:crunchyroll"]},
@@ -94,8 +94,8 @@ SERVICES = [
     {"id": "115", "name": "115 网盘", "vendor": "115", "category": "cloud", "hex": "#2F7BFF", "popularity": 24, "icon": ["arc:115"]},
 
     # ── AI 工具 ───────────────────────────────────────────────
-    {"id": "chatgpt", "name": "ChatGPT Plus", "vendor": "OpenAI", "category": "ai", "hex": "#10A37F", "popularity": 98, "aliases": ["gpt", "openai"], "icon": ["si:openai", "logos:openai-icon"]},
-    {"id": "claude", "name": "Claude Pro", "vendor": "Anthropic", "category": "ai", "hex": "#D97757", "popularity": 88, "aliases": ["克劳德"], "icon": ["si:claude", "logos:claude-icon"]},
+    {"tile": "#0D0D0D", "id": "chatgpt", "name": "ChatGPT Plus", "vendor": "OpenAI", "category": "ai", "hex": "#10A37F", "popularity": 98, "aliases": ["gpt", "openai"], "icon": ["si:openai", "logos:openai-icon"]},
+    {"tile": "#F0EEE6", "id": "claude", "name": "Claude Pro", "vendor": "Anthropic", "category": "ai", "hex": "#D97757", "popularity": 88, "aliases": ["克劳德"], "icon": ["si:claude", "logos:claude-icon"]},
     {"id": "gemini", "name": "Gemini Advanced", "vendor": "Google", "category": "ai", "hex": "#4285F4", "popularity": 72, "aliases": ["bard"], "icon": ["si:googlegemini", "logos:google-gemini"]},
     {"id": "copilot", "name": "GitHub Copilot", "vendor": "GitHub", "category": "ai", "hex": "#24292F", "popularity": 76, "aliases": ["副驾驶"], "icon": ["si:githubcopilot", "logos:github-copilot"]},
     {"id": "cursor", "name": "Cursor Pro", "vendor": "Anysphere", "category": "ai", "hex": "#000000", "popularity": 74, "icon": ["logos:cursor", "arc:apps4flip-cursor"]},

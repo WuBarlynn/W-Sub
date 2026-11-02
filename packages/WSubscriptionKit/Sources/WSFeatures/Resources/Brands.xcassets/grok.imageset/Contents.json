@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "grok.svg",
+      "filename": "grok.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

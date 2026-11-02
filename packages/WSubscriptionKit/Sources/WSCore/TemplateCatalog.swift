@@ -1,23 +1,26 @@
 import Foundation
 
-public struct SubscriptionTemplate: Identifiable, Codable, Hashable, Sendable {
+public struct SubscriptionTemplate: Identifiable, Hashable, Sendable, Decodable {
     public var id: String
     public var name: String
     public var vendor: String
     public var categoryID: String
     /// 内置品牌图标名（Assets 中没有对应资源时为 nil）
     public var brand: String?
-    /// color = 自带背景的全彩标；mono = 单色标，需要用户界面铺品牌色底
+    /// color = 自带背景的全彩标；mono = 单色标，由界面铺底色
     public var style: String
+    /// 品牌主色（用于文字、图表）
     public var hex: String
+    /// 图标方块底色（多数等于品牌色，流媒体多为深色）
+    public var tile: String
     public var symbol: String
     public var defaultCycle: BillingCycle
     public var aliases: [String]
     public var popularity: Int
 
     public init(id: String, name: String, vendor: String, categoryID: String, brand: String?,
-                style: String = "mono", hex: String, symbol: String, defaultCycle: BillingCycle,
-                aliases: [String], popularity: Int) {
+                style: String = "mono", hex: String, tile: String? = nil,
+                symbol: String, defaultCycle: BillingCycle, aliases: [String], popularity: Int) {
         self.id = id
         self.name = name
         self.vendor = vendor
@@ -25,10 +28,31 @@ public struct SubscriptionTemplate: Identifiable, Codable, Hashable, Sendable {
         self.brand = brand
         self.style = style
         self.hex = hex
+        self.tile = tile ?? hex
         self.symbol = symbol
         self.defaultCycle = defaultCycle
         self.aliases = aliases
         self.popularity = popularity
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, vendor, categoryID, brand, style, hex, tile, symbol, defaultCycle, aliases, popularity
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        vendor = try c.decodeIfPresent(String.self, forKey: .vendor) ?? ""
+        categoryID = try c.decode(String.self, forKey: .categoryID)
+        brand = try c.decodeIfPresent(String.self, forKey: .brand)
+        style = try c.decodeIfPresent(String.self, forKey: .style) ?? "mono"
+        hex = try c.decodeIfPresent(String.self, forKey: .hex) ?? "#7C7C86"
+        tile = try c.decodeIfPresent(String.self, forKey: .tile) ?? hex
+        symbol = try c.decodeIfPresent(String.self, forKey: .symbol) ?? "creditcard.fill"
+        defaultCycle = try c.decodeIfPresent(BillingCycle.self, forKey: .defaultCycle) ?? .monthly
+        aliases = try c.decodeIfPresent([String].self, forKey: .aliases) ?? []
+        popularity = try c.decodeIfPresent(Int.self, forKey: .popularity) ?? 40
     }
 }
 

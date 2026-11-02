@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "substack.svg",
+      "filename": "substack.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

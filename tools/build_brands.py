@@ -80,7 +80,7 @@ def dashboard_icon(slug):
         svg = handle.read()
     if "<svg" not in svg:
         return None
-    return svg
+    return normalize_square(svg)
 
 
 def simple_icon(slug, version):
@@ -99,16 +99,76 @@ def simple_icon(slug, version):
     return {"body": f'<path d="{match.group(1)}"/>', "w": 24, "h": 24, "mono": True}
 
 
+def normalize_square(svg):
+    """把所有图标规整成正方形画布：等比居中补透明边，绝不裁切内容。
+    这样 UI 端无论 scaledToFit 还是 scaledToFill 都不会切边或错位。"""
+    match = re.search(r'viewBox="([^"]+)"', svg)
+    if match:
+        parts = [float(v) for v in re.split(r"[ ,]+", match.group(1).strip()) if v]
+        if len(parts) != 4:
+            return svg
+        min_x, min_y, width, height = parts
+    else:
+        width_match = re.search(r'width="([\d.]+)', svg)
+        height_match = re.search(r'height="([\d.]+)', svg)
+        if not (width_match and height_match):
+            return svg
+        min_x = min_y = 0.0
+        width = float(width_match.group(1))
+        height = float(height_match.group(1))
+        svg = re.sub(r"<svg", f'<svg viewBox="0 0 {width:g} {height:g}"', svg, count=1)
+
+    if width <= 0 or height <= 0:
+        return svg
+
+    side = max(width, height)
+    new_view = f"{min_x - (side - width) / 2:g} {min_y - (side - height) / 2:g} {side:g} {side:g}"
+    svg = re.sub(r'viewBox="[^"]+"', f'viewBox="{new_view}"', svg, count=1)
+    svg = re.sub(r"\swidth=\"[^\"]+\"", "", svg, count=1)
+    svg = re.sub(r"\sheight=\"[^\"]+\"", "", svg, count=1)
+    return svg
+
+
 def wrap(body, w, h, mono, color):
     body = body.replace('currentColor', f'#{color}')
-    return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
-        f'width="{w}" height="{h}">{body}</svg>'
+    return normalize_square(
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}">{body}</svg>'
     )
 
 
 def normalize(text):
     return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+COMPOSER = os.path.join(CACHE, "compose_icon")
+
+
+def ensure_composer():
+    if os.path.exists(COMPOSER):
+        return COMPOSER
+    os.makedirs(CACHE, exist_ok=True)
+    subprocess.run(["swiftc", "-O", os.path.join(ROOT, "tools/compose_icon.swift"), "-o", COMPOSER],
+                   check=True, capture_output=True)
+    return COMPOSER
+
+
+def compose(png_path, tile_hex, scale):
+    """把纯 logo 合成到品牌底色上，或把自带背景的图标裁成满版。"""
+    try:
+        subprocess.run([ensure_composer(), png_path, tile_hex, png_path, str(scale)],
+                       check=True, capture_output=True)
+    except Exception as error:  # 合成失败不影响主流程，保留原始栅格图
+        print(f"compose failed: {png_path} {error}")
+
+
+def rasterize(svg_path, png_path, side=512):
+    """用 macOS 的 sips 把 SVG 栅格化，保证运行时所见即所得。"""
+    result = subprocess.run(
+        ["sips", "-s", "format", "png", svg_path, "--out", png_path,
+         "--resampleHeightWidth", str(side), str(side)],
+        capture_output=True,
+    )
+    return result.returncode == 0 and os.path.exists(png_path)
 
 
 def resolve(entry, logos, arc):
@@ -167,13 +227,19 @@ def main():
                 handle.write(svg)
             folder = os.path.join(ASSETS, f"{brand}.imageset")
             os.makedirs(folder, exist_ok=True)
-            with open(os.path.join(folder, f"{brand}.svg"), "w", encoding="utf-8") as handle:
+            svg_path = os.path.join(folder, f"{brand}.svg")
+            with open(svg_path, "w", encoding="utf-8") as handle:
                 handle.write(svg)
+            png_name = f"{brand}.png"
+            png_path = os.path.join(folder, png_name)
+            if rasterize(svg_path, png_path):
+                # 单色标的图形本身带内边距，放大一点才和全彩图标视觉等大
+                compose(png_path, entry.get("tile", entry["hex"]),
+                        0.80 if style == "mono" else 0.64)
             with open(os.path.join(folder, "Contents.json"), "w") as handle:
                 json.dump({
-                    "images": [{"filename": f"{brand}.svg", "idiom": "universal"}],
+                    "images": [{"filename": png_name, "idiom": "universal"}],
                     "info": {"author": "xcode", "version": 1},
-                    "properties": {"preserves-vector-representation": True},
                 }, handle, indent=2)
         else:
             missing.append(entry["id"])
@@ -186,6 +252,7 @@ def main():
             "brand": brand,
             "style": style or "mono",
             "hex": entry["hex"],
+            "tile": entry.get("tile", entry["hex"]),
             "symbol": entry.get("symbol", "creditcard.fill"),
             "defaultCycle": {"kind": entry.get("cycle", "monthly")},
             "aliases": entry.get("aliases", []),

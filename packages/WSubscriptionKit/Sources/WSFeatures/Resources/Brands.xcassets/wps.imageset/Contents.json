@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "wps.svg",
+      "filename": "wps.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

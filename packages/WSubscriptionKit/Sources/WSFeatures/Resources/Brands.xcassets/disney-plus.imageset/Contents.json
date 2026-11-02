@@ -1,15 +1,12 @@
 {
   "images": [
     {
-      "filename": "disney-plus.svg",
+      "filename": "disney-plus.png",
       "idiom": "universal"
     }
   ],
   "info": {
     "author": "xcode",
     "version": 1
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

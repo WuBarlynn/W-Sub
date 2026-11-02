@@ -316,7 +316,7 @@ public final class AppModel: ObservableObject {
                                         anchorDate: Date(),
                                         reminderOffsets: snapshot?.settings.defaultReminderOffsets ?? [3],
                                         symbolName: template.symbol,
-                                        tintHex: template.hex,
+                                        tintHex: template.tile,
                                         brandID: template.brand)
         await save(subscription)
     }
