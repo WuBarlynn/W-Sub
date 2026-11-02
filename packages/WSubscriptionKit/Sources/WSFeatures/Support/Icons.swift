@@ -71,6 +71,11 @@ public struct IconTile: View {
             }
         }
         .frame(width: size, height: size)
+        // 深色底上的深色品牌（Disney+ 的深蓝、Netflix 的近黑）会和卡片融在一起，
+        // 加一圈极细的描边，让每个图标块在任何底色上都有边界。
+        .overlay {
+            shape.strokeBorder(Color.primary.opacity(0.10), lineWidth: 0.6)
+        }
     }
 
     private var monogram: String {

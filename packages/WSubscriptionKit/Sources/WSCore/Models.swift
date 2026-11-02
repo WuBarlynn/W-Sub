@@ -185,6 +185,19 @@ public struct Subscription: Identifiable, Codable, Hashable, Sendable {
                                           to: Calendar.ws.startOfDay(for: trialEndDate)).day
     }
 
+    /// 上一次已经发生的扣款日。用于账单卡上「上次扣款」这一栏。
+    /// 往回找 25 个月，覆盖到最长的年付周期；买断只在建账日当天算一次。
+    public func lastBillingDate(before reference: Date = Date(),
+                                calendar: Calendar = .ws) -> Date? {
+        let today = calendar.startOfDay(for: reference)
+        if cycle.isOneTime {
+            return anchorDate <= today ? calendar.startOfDay(for: anchorDate) : nil
+        }
+        guard let start = calendar.date(byAdding: .month, value: -25, to: today) else { return nil }
+        let interval = DateInterval(start: start, end: today.addingTimeInterval(1))
+        return cycle.dates(in: interval, anchor: anchorDate, calendar: calendar).last
+    }
+
     public var lastPriceIncrease: PriceChange? {
         priceHistory.last(where: { $0.from != nil && $0.to.minorUnits > ($0.from?.minorUnits ?? 0) })
     }
