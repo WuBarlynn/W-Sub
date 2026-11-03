@@ -182,7 +182,7 @@ private struct SubscriptionDeck: View {
     @State private var position: CGFloat = 0
     @State private var dragStart: CGFloat?
     /// 后面的卡向下错开的距离：堆叠在底部露边
-    private let stackGap: CGFloat = 11
+    private let stackGap: CGFloat = 7
 
     var body: some View {
         GeometryReader { proxy in
@@ -217,30 +217,45 @@ private struct SubscriptionDeck: View {
         return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
             .equatable()
             .frame(height: height)
-            .overlay {
-                // 越靠后的卡压一层黑，层次连续；卡片本体不参与每帧重算
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(.black.opacity(0.26 * Double(min(2, max(0, d)))))
-            }
-            .scaleEffect(scale(d), anchor: .top)
+            // 后面的卡逐个递减透明度，淡入页面背景，比压黑更轻
+            .opacity(stackOpacity(d))
+            .scaleEffect(x: scaleX(d), y: 1, anchor: .top)
             .offset(y: offset(d, height: height))
-            // 层级在整次拖动中固定，避免动画期间重排
-            .zIndex(Double(100 - abs(i - index) * 2))
+            .zIndex(zIndex(for: i))
             .allowsHitTesting(i == index)
             .onTapGesture { if i == index { onSelect(entry.item) } }
     }
 
     // MARK: 变换：d 的单一连续函数（没有 index 分支，这是消除跳动的关键）
 
-    /// 堆叠中的卡略小；正在翻走的卡保持原尺寸飞出。
-    private func scale(_ d: CGFloat) -> CGFloat {
-        d >= 0 ? 1 - 0.04 * min(2, d) : 1
+    /// 堆叠中的卡逐个递减透明度：第一张 0.55，第二张 0.28，淡进背景。
+    private func stackOpacity(_ d: CGFloat) -> Double {
+        guard d > 0 else { return 1 }
+        return max(0.25, 1 - 0.45 * Double(min(2, d)))
+    }
+
+    /// 堆叠中的卡只横向收窄（不缩高度）：
+    /// 高度不变 + 向下偏移，底部才能露出一条边；等比缩小会把露边抵消掉。
+    private func scaleX(_ d: CGFloat) -> CGFloat {
+        d >= 0 ? 1 - 0.05 * min(2, d) : 1
     }
 
     /// d >= 0：堆叠的卡向下错开 stackGap，底部露边；
     /// d < 0：翻走的卡按 1:1 跟手向上飞出（d 每减 1，位移正好一整张卡高）。
     private func offset(_ d: CGFloat, height: CGFloat) -> CGFloat {
         d >= 0 ? stackGap * d : d * height
+    }
+
+    /// 正在往回翻（下滑，position 小于当前 index）时，从上方回来的那张卡必须盖在当前卡之上，
+    /// 否则它会从当前卡「下面」滑出来，看起来很奇怪。
+    /// 上滑时当前卡始终在最上，飞走后露出下一张。
+    private var returning: Bool { position < CGFloat(index) }
+
+    private func zIndex(for i: Int) -> Double {
+        if i == index { return returning ? 90 : 100 }
+        if i == index - 1 { return returning ? 110 : 80 }
+        if i < index { return 80 }
+        return Double(80 - (i - index))
     }
 
     // MARK: 手势
@@ -456,11 +471,11 @@ private struct SubscriptionDeckCard: View, Equatable {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(surface)
         .overlay {
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
                 .strokeBorder(.white.opacity(colorScheme == .dark ? 0.12 : 0.05), lineWidth: 0.5)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
     }
 
     // 顶部横条：浅色半透明底，图标和名字都放在这条上，深色卡片里也能一眼看清
@@ -634,9 +649,9 @@ private struct SubscriptionDeckCard: View, Equatable {
             .frame(height: 34)
             .frame(maxWidth: .infinity)
             .background(Color(hex: "#8E7CC3").opacity(0.24),
-                        in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                        in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
                     .strokeBorder(Color(hex: "#A996E3").opacity(0.30), lineWidth: 0.5)
             }
         }
