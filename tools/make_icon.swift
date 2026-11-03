@@ -52,37 +52,45 @@ drawCard(centerY: 430, scale: 1.00, alpha: 1.00)
 
 if variant == "renew" {
     let center = CGPoint(x: canvas / 2, y: 430)
-    let radius: CGFloat = 138
+    let radius: CGFloat = 132
     let lineWidth: CGFloat = 48
     let halfWidth = lineWidth / 2
 
-    // 圆环：从 118° 逆时针画到 30°，右上留缺口
-    let startAngle = 118.0 * CGFloat.pi / 180
-    let baseAngle = 30.0 * CGFloat.pi / 180
+    func radians(_ degrees: CGFloat) -> CGFloat { degrees * CGFloat.pi / 180 }
+    func point(_ angle: CGFloat, _ r: CGFloat) -> CGPoint {
+        CGPoint(x: center.x + cos(angle) * r, y: center.y + sin(angle) * r)
+    }
 
-    ctx.setStrokeColor(brand)
-    ctx.setLineWidth(lineWidth)
-    ctx.setLineCap(.butt)
-    ctx.addArc(center: center, radius: radius,
-               startAngle: startAngle, endAngle: baseAngle, clockwise: false)
-    ctx.strokePath()
+    // 缺口在右下角：尾巴在右侧（斜切），箭头在正下方
+    let baseAngle = radians(-88)
+    let tailAngle = radians(-2)
+    let chisel = radians(6)
+    let tipAngle = baseAngle + radians(34)
 
-    // 箭头底边沿半径方向，正好接住圆环的切口，不会出现台阶
-    let tipAngle = baseAngle + 34.0 * CGFloat.pi / 180
-    let headHalf: CGFloat = 36
-    let outer = CGPoint(x: center.x + cos(baseAngle) * (radius + headHalf),
-                        y: center.y + sin(baseAngle) * (radius + headHalf))
-    let inner = CGPoint(x: center.x + cos(baseAngle) * (radius - headHalf),
-                        y: center.y + sin(baseAngle) * (radius - headHalf))
-    let tip = CGPoint(x: center.x + cos(tipAngle) * radius,
-                      y: center.y + sin(tipAngle) * radius)
+    let outerStart = tailAngle + chisel
+    let innerEnd = tailAngle - chisel
 
-    let head = CGMutablePath()
-    head.move(to: outer)
-    head.addLine(to: tip)
-    head.addLine(to: inner)
-    head.closeSubpath()
+    // 环身：上沿从斜切口逆时针绕到箭头根部，再沿内沿绕回
+    let ring = CGMutablePath()
+    ring.move(to: point(innerEnd, radius - halfWidth))
+    ring.addLine(to: point(outerStart, radius + halfWidth))
+    ring.addArc(center: center, radius: radius + halfWidth,
+                startAngle: outerStart, endAngle: baseAngle + radians(5) + 2 * CGFloat.pi, clockwise: false)
+    ring.addLine(to: point(baseAngle + radians(5), radius - halfWidth))
+    ring.addArc(center: center, radius: radius - halfWidth,
+                startAngle: baseAngle + radians(5), endAngle: innerEnd, clockwise: true)
+    ring.closeSubpath()
     ctx.setFillColor(brand)
+    ctx.addPath(ring)
+    ctx.fillPath()
+
+    // 箭头单独画，底边比环身宽一点，才是「箭头」而不是尖角
+    let headHalf = halfWidth + 12
+    let head = CGMutablePath()
+    head.move(to: point(baseAngle, radius + headHalf))
+    head.addLine(to: point(tipAngle, radius))
+    head.addLine(to: point(baseAngle, radius - headHalf))
+    head.closeSubpath()
     ctx.addPath(head)
     ctx.fillPath()
 }

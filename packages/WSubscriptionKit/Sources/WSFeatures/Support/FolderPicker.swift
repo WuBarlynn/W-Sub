@@ -3,29 +3,31 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
-/// 系统文件夹选择器。
+/// 选择保存位置的三条路，都不需要用户理解「security-scoped bookmark」。
 ///
-/// 三个必须踩准的点，缺一个「打开」按钮就会点了没反应：
+/// 背景（Apple DTS 在开发者论坛的回复）：iOS 26 的文件选择器**只对可写目录启用「打开」**，
+/// 不可写的目录按钮是灰的或点了没反应。再叠加侧载签名带来的沙盒差异，直接用
+/// `UIDocumentPickerViewController(forOpeningContentTypes: [.folder])` 选目录在真机上很容易失败。
+/// 所以这里除了「选文件夹」，还提供了两条不依赖目录选择的路径：
 ///
-/// 1. Info.plist 里要同时有 `LSSupportsOpeningDocumentsInPlace` **和** `UIFileSharingEnabled`。
-///    只有前者时选择器仍可能按「导入」语义工作 —— 而文件夹无法被复制进沙盒，系统就只回一个
-///    空数组，甚至不回调。这两项光靠 `INFOPLIST_KEY_*` 构建设置写不进 plist，所以用了真实
-///    的 `Config/Info.plist`。
-/// 2. 必须 `asCopy: false`，否则同样是「复制」语义。
-/// 3. 要给一个具体的 `directoryURL`。从默认的「最近项目」根进去时，部分 iOS 版本不会启用
-///    「打开」按钮；落在真实目录上才稳定。
+/// - `saveToFiles`：走「存储到文件」导出面板，用户选一个目标文件夹，系统把占位文件写进去，
+///   我们拿到落盘 URL 后取它的父目录。这是系统自己保证可写的路径。
+/// - `appFolder`：直接用 App 自己的 Documents（Info.plist 里开了 `UIFileSharingEnabled`，
+///   在「文件」App 的「我的 iPhone > W Sub」里可见）。永远可写，零授权。
 @MainActor
 enum FolderPickerPresenter {
     enum Outcome {
         case picked(URL)
         case cancelled
         /// 选择器回调了，但没带回任何 URL。系统「准备项目」失败时就是这样。
-        /// 不能当取消处理，否则用户点「打开」只会看到界面关掉、什么都没发生。
         case empty
     }
 
     private static var picker: UIDocumentPickerViewController?
     private static var coordinator: Coordinator?
+    private static var temporaryFile: URL?
+
+    // MARK: - 打开目录（尽力而为）
 
     static func present(_ onOutcome: @escaping (Outcome) -> Void) {
         guard let host = topViewController() else {
@@ -39,6 +41,56 @@ enum FolderPickerPresenter {
         controller.shouldShowFileExtensions = false
         controller.directoryURL = FileManager.default.urls(for: .documentDirectory,
                                                            in: .userDomainMask).first
+
+        attach(controller, to: host, onOutcome: onOutcome)
+    }
+
+    // MARK: - 存储到文件（系统保证可写）
+
+    /// 先写一个同名占位文件，用「存储到文件」面板让用户挑目标文件夹；
+    /// 系统把文件写进去之后回调落盘 URL，父目录就是用户选的目录。
+    static func saveToFiles(fileName: String, onOutcome: @escaping (Outcome) -> Void) {
+        guard let host = topViewController() else {
+            onOutcome(.cancelled)
+            return
+        }
+
+        let temporary = FileManager.default.temporaryDirectory
+            .appendingPathComponent(fileName, isDirectory: false)
+        // 非空占位，避免个别文件提供者拒绝 0 字节文件
+        do {
+            try Data([0x0]).write(to: temporary, options: .atomic)
+        } catch {
+            onOutcome(.empty)
+            return
+        }
+        temporaryFile = temporary
+
+        let controller = UIDocumentPickerViewController(forExporting: [temporary], asCopy: true)
+        attach(controller, to: host) { outcome in
+            defer { cleanUpTemporary() }
+            switch outcome {
+            case .picked(let url):
+                onOutcome(.picked(url.deletingLastPathComponent()))
+            default:
+                onOutcome(outcome)
+            }
+        }
+    }
+
+    private static func cleanUpTemporary() {
+        if let temporaryFile {
+            try? FileManager.default.removeItem(at: temporaryFile)
+        }
+        temporaryFile = nil
+    }
+
+    // MARK: - 公共装配
+
+    private static func attach(_ controller: UIDocumentPickerViewController,
+                               to host: UIViewController,
+                               onOutcome: @escaping (Outcome) -> Void) {
+        controller.allowsMultipleSelection = false
 
         let coordinator = Coordinator { outcome in
             finish()

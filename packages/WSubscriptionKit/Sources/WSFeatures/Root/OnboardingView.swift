@@ -17,6 +17,7 @@ public struct OnboardingView: View {
     @State private var acknowledged = false
     @State private var isWorking = false
     @State private var localError: String?
+    @State private var showLocationOptions = false
 
     public init() {}
 
@@ -41,6 +42,14 @@ public struct OnboardingView: View {
                 footer
             }
         }
+        .confirmationDialog("数据保存在哪里", isPresented: $showLocationOptions, titleVisibility: .visible) {
+            Button("用 App 自己的文件夹") { useAppFolder() }
+            Button("存到「文件」…") { saveToFiles() }
+            Button("直接选文件夹") { presentPicker() }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("App 文件夹最稳，在「文件 > 我的 iPhone > W Sub」里可见；存到「文件」可以选 iCloud 云盘。")
+        }
         .task {
             #if DEBUG
             // 调试用：-ws-picker 直接打开文件夹选择器，方便在没有 UI 自动化时验证授权流程
@@ -54,26 +63,40 @@ public struct OnboardingView: View {
     }
 
     private func presentPicker() {
-        localError = nil
-        FolderPickerPresenter.present { outcome in
-            switch outcome {
-            case .picked(let url):
-                accept(url)
-            case .empty:
-                localError = "系统没能读取这个文件夹，换一个试试（iCloud 云盘可以先在「文件」里打开一次）"
-            case .cancelled:
-                break
-            }
+        FolderPickerPresenter.present { handle($0) }
+    }
+
+    /// 走「存储到文件」面板：系统保证目标可写，落盘 URL 的父目录就是用户选的目录。
+    private func saveToFiles() {
+        FolderPickerPresenter.saveToFiles(fileName: "WSubscription.vault") { handle($0, verify: false) }
+    }
+
+    /// 零授权：直接落在 App 自己的 Documents 里，文件 App 里能看到（Info.plist 开了文件共享）。
+    private func useAppFolder() {
+        let folder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        accept(folder)
+    }
+
+    private func handle(_ outcome: FolderPickerPresenter.Outcome, verify: Bool = true) {
+        switch outcome {
+        case .picked(let url):
+            accept(url, verify: verify)
+        case .empty:
+            localError = "系统没能读取这个位置，换一种方式试试"
+        case .cancelled:
+            break
         }
     }
 
     /// 选完立刻验证一次：目录 + 可写。iCloud 里只读的共享文件夹到这里就会被挡住，
     /// 不会等到「创建」按钮按下去才失败。
-    private func accept(_ url: URL) {
+    private func accept(_ url: URL, verify: Bool = true) {
         localError = nil
         do {
-            let access = FolderAccess(url: url, mode: .securityScoped)
-            try access.verifyWritable()
+            if verify {
+                let access = FolderAccess(url: url, mode: .securityScoped)
+                try access.verifyWritable()
+            }
             directory = url
             model.clearMessages()
             withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
@@ -111,6 +134,11 @@ public struct OnboardingView: View {
                     Spacer()
                 }
             }
+
+            Text("数据是一个加密文件，放进你选的文件夹。选不了位置时用「App 自己的文件夹」即可，之后在「文件」里能移动它。")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.top, 24)
     }
@@ -182,8 +210,8 @@ public struct OnboardingView: View {
             case 0:
                 primary("开始") { advance() }
             case 1:
-                primary(directory == nil ? "选择文件夹" : "下一步", enabled: true) {
-                    if directory == nil { presentPicker() } else { advance() }
+                primary(directory == nil ? "选择保存位置" : "下一步", enabled: true) {
+                    if directory == nil { showLocationOptions = true } else { advance() }
                 }
             case 2:
                 primary(isWorking ? "创建中…" : "创建", enabled: canCreate) {
