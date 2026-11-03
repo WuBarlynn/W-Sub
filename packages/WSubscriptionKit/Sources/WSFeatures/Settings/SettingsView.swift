@@ -8,29 +8,28 @@ import WSCore
 public struct SettingsView: View {
     @EnvironmentObject private var model: AppModel
 
-    @State private var showChangePassphrase = false
-    @State private var showRecovery = false
-    @State private var recoveryCode: String?
-    @State private var confirmDisableBiometry = false
     @State private var backupURL: URL?
     @State private var csvURL: URL?
     @State private var notificationsOn = false
     @State private var iconCount = IconStore.shared.count()
     @State private var confirmCleanIcons = false
-    @State private var confirmImportBackup = false
-    @State private var showImportBackup = false
-    @State private var importPassphrase = ""
-    @State private var showImportPassphrase = false
-    @State private var importError: String?
+    @State private var confirmImport = false
+    @State private var showImport = false
     @State private var rateDrafts: [String: String] = [:]
 
-    private static let vaultType: [UTType] = {
-        [UTType(filenameExtension: "vault") ?? .data]
+    private static let jsonType: [UTType] = {
+        [UTType.json, UTType(filenameExtension: "json") ?? .data]
     }()
 
     public init() {}
 
     private var snapshot: VaultSnapshot { model.snapshot ?? VaultSnapshot() }
+
+    private var version: String {
+        let v = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let b = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(v)（\(b)）"
+    }
 
     /// 用到的外币（主币种之外），需要给它们设汇率才能真正加总
     private var foreignCurrencies: [String] {
@@ -56,51 +55,38 @@ public struct SettingsView: View {
     public var body: some View {
         NavigationStack {
             Form {
-                Section("安全") {
-                    // 默认不锁 App：库文件在磁盘是密文，主密钥在钥匙串，启动静默打开。
+                Section {
                     LabeledContent {
-                        Text("库已加密")
+                        Text("App 内部「文件」可见")
                             .foregroundStyle(.secondary)
                     } label: {
-                        row("存储加密", "lock.fill")
+                        row("数据位置", "folder.fill")
                     }
+                    Text("数据保存在 App 自己的文件夹里，可在系统「文件」App 的「我的 iPhone > W Sub」中打开。")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("数据") {
                     Button {
                         Task {
                             backupURL = nil
-                            backupURL = await model.exportEncryptedBackup()
+                            backupURL = await model.exportJSON()
                         }
                     } label: {
-                        row("导出加密备份", "lock.doc")
+                        row("导出数据", "square.and.arrow.up")
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WSPressButtonStyle())
 
-                    Button { confirmImportBackup = true } label: {
-                        row("导入备份", "square.and.arrow.down")
+                    Button { confirmImport = true } label: {
+                        row("导入数据", "square.and.arrow.down")
                     }
-                    .buttonStyle(.plain)
-
-                    Button { Task { await model.flush() } } label: {
-                        row("立即保存", "checkmark.circle.fill")
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        Task {
-                            recoveryCode = await model.regenerateRecoveryKey()
-                            showRecovery = recoveryCode != nil
-                        }
-                    } label: {
-                        row("重新生成恢复码", "number.square.fill")
-                    }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WSPressButtonStyle())
 
                     Button { csvURL = makeCSV() } label: {
-                        row("导出 CSV（明文）", "square.and.arrow.up")
+                        row("导出 CSV", "tablecells")
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WSPressButtonStyle())
 
                     if iconCount > 0 {
                         Button { confirmCleanIcons = true } label: {
@@ -110,7 +96,7 @@ public struct SettingsView: View {
                                 row("清理自定义图标", "photo.on.rectangle")
                             }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(WSPressButtonStyle())
                     }
                 }
 
@@ -174,63 +160,44 @@ public struct SettingsView: View {
                 }
 
                 Section("关于") {
-                    LabeledContent("版本", value: "1.0")
+                    LabeledContent("版本", value: version)
+                    LabeledContent("作者", value: "WuBarlynn")
+                    Button {
+                        if let url = URL(string: "https://github.com/WuBarlynn/W-Sub") {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        HStack {
+                            row("GitHub 仓库", "link")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .buttonStyle(WSPressButtonStyle())
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.wsPage)
             .navigationTitle("设置")
-            .sheet(isPresented: $showChangePassphrase) { ChangePassphraseView() }
-            .sheet(isPresented: $showRecovery) { RecoveryCodeSheet(code: recoveryCode ?? "") }
             .sheet(isPresented: Binding(get: { backupURL != nil },
                                         set: { if !$0 { backupURL = nil } })) {
-                if let backupURL { BackupExportSheet(url: backupURL) }
+                if let backupURL { ExportSheet(url: backupURL) }
             }
             .sheet(isPresented: Binding(get: { csvURL != nil },
                                         set: { if !$0 { csvURL = nil } })) {
                 if let csvURL { CSVExportSheet(url: csvURL) }
             }
-            .fileImporter(isPresented: $showImportBackup,
-                          allowedContentTypes: Self.vaultType,
+            .fileImporter(isPresented: $showImport,
+                          allowedContentTypes: Self.jsonType,
                           allowsMultipleSelection: false) { result in
                 switch result {
                 case .success(let urls):
                     guard let url = urls.first else { return }
-                    Task {
-                        let ok = await model.importVault(from: url, passphrase: importPassphrase)
-                        if !ok { importError = model.flowError }
-                    }
+                    Task { await model.importJSON(from: url) }
                 case .failure:
                     break
-                }
-            }
-            .sheet(isPresented: $showImportPassphrase) {
-                NavigationStack {
-                    Form {
-                        Section("输入备份的密码") {
-                            SecureField("密码", text: $importPassphrase)
-                                .textContentType(.password)
-                        }
-                        if let importError {
-                            Section {
-                                Text(importError).font(.system(size: 12)).foregroundStyle(Color(hex: "#C4320A"))
-                            }
-                        }
-                    }
-                    .navigationTitle("导入备份")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("取消") { showImportPassphrase = false }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("选择文件") {
-                                showImportPassphrase = false
-                                showImportBackup = true
-                            }
-                            .disabled(importPassphrase.isEmpty)
-                        }
-                    }
                 }
             }
             .onAppear {
@@ -240,10 +207,6 @@ public struct SettingsView: View {
                     notificationsOn = settings.authorizationStatus == .authorized
                 }
             }
-            .confirmationDialog("关闭生物识别解锁？", isPresented: $confirmDisableBiometry, titleVisibility: .visible) {
-                Button("关闭", role: .destructive) { Task { await model.setBiometry(false) } }
-                Button("取消", role: .cancel) {}
-            }
             .confirmationDialog("删除全部自定义图标？", isPresented: $confirmCleanIcons, titleVisibility: .visible) {
                 Button("删除", role: .destructive) {
                     IconStore.shared.removeAll()
@@ -251,11 +214,9 @@ public struct SettingsView: View {
                 }
                 Button("取消", role: .cancel) {}
             }
-            .confirmationDialog("导入备份会替换当前所有数据", isPresented: $confirmImportBackup, titleVisibility: .visible) {
-                Button("下一步", role: .destructive) { showImportPassphrase = true }
+            .confirmationDialog("导入数据会替换当前所有订阅", isPresented: $confirmImport, titleVisibility: .visible) {
+                Button("选择文件", role: .destructive) { showImport = true }
                 Button("取消", role: .cancel) {}
-            } message: {
-                Text("导入后需要用那份备份的密码打开。")
             }
         }
     }
@@ -293,107 +254,17 @@ public struct SettingsView: View {
     }
 }
 
-struct ChangePassphraseView: View {
-    @EnvironmentObject private var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var first = ""
-    @State private var second = ""
-    @State private var error: String?
-    @State private var isWorking = false
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    SecureField("新密码", text: $first)
-                        .textContentType(.newPassword)
-                    SecureField("再输入一次", text: $second)
-                        .textContentType(.newPassword)
-                }
-                if let error {
-                    Section {
-                        Text(error).font(.system(size: 12)).foregroundStyle(Color(hex: "#C4320A"))
-                    }
-                }
-            }
-            .navigationTitle("修改密码")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isWorking ? "保存中…" : "保存") {
-                        Task { await submit() }
-                    }
-                    .disabled(first.count < 8 || first != second || isWorking)
-                }
-            }
-        }
-    }
-
-    private func submit() async {
-        isWorking = true
-        defer { isWorking = false }
-        let ok = await model.changePassphrase(to: first)
-        if ok { dismiss() } else { error = model.notice ?? "修改失败" }
-    }
-}
-
-struct RecoveryCodeSheet: View {
-    let code: String
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 14) {
-                Text(code)
-                    .font(.system(size: 17, weight: .medium, design: .monospaced))
-                    .lineSpacing(7)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .background(Color.wsCard, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .strokeBorder(Color.wsHairline, lineWidth: 0.5)
-                    }
-
-                Button {
-                    UIPasteboard.general.string = code
-                } label: {
-                    Label("复制", systemImage: "doc.on.doc")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-
-                Spacer()
-            }
-            .padding(20)
-            .navigationTitle("恢复码")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("完成") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
-/// 加密备份导出：文件本身就是加密的，密码不变
-struct BackupExportSheet: View {
+/// 明文数据导出：JSON 文件，可读、可迁移
+struct ExportSheet: View {
     let url: URL
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 14) {
-                Text("加密备份已就绪")
+                Text("数据已就绪")
                     .font(.system(size: 17, weight: .semibold))
-                Text("文件保持加密，用当前密码解锁。可存到「文件」或 iCloud。")
+                Text("JSON 格式，可存到「文件」或 iCloud，之后可随时导入。")
                     .font(.wsMeta)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -429,7 +300,7 @@ struct CSVExportSheet: View {
             VStack(spacing: 14) {
                 Text("CSV 是明文")
                     .font(.system(size: 17, weight: .semibold))
-                Text("导出后不再受加密保护。")
+                Text("可用 Numbers / Excel 打开。")
                     .font(.wsMeta)
                     .foregroundStyle(.secondary)
 

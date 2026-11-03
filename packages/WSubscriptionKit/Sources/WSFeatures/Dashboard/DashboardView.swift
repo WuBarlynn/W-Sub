@@ -98,11 +98,22 @@ public struct HomeView: View {
             Screen {
                 VStack(spacing: 12) {
                     HStack(alignment: .top, spacing: 12) {
-                        SpendTrendCard(points: monthlyPoints,
-                                       total: monthlyPoints.last?.amount ?? .zero(currency),
-                                       delta: monthDelta)
-                        YearProgressCard(remaining: snapshot.remainingThisYear(),
-                                         pendingCount: pendingThisYear)
+                        Button {
+                            model.selectedTab = .stats
+                        } label: {
+                            SpendTrendCard(points: monthlyPoints,
+                                           total: monthlyPoints.last?.amount ?? .zero(currency),
+                                           delta: monthDelta)
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            model.selectedTab = .stats
+                        } label: {
+                            YearProgressCard(remaining: snapshot.remainingThisYear(),
+                                             pendingCount: pendingThisYear)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     if items.isEmpty {
@@ -435,12 +446,19 @@ private struct SpendTrendCard: View {
 
     var body: some View {
         TallStatCard(title: "本月支出") {
-            Text(total.formatted())
-                .font(.wsNumber(21, weight: .semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .padding(.top, 3)
+            HStack(alignment: .top) {
+                Text(total.formatted())
+                    .font(.wsNumber(21, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .padding(.top, 3)
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 8)
+            }
 
             Spacer(minLength: 8)
 
@@ -490,12 +508,19 @@ private struct YearProgressCard: View {
 
     var body: some View {
         TallStatCard(title: "今年剩余") {
-            Text(remaining.formatted())
-                .font(.wsNumber(21, weight: .semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .padding(.top, 3)
+            HStack(alignment: .top) {
+                Text(remaining.formatted())
+                    .font(.wsNumber(21, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .padding(.top, 3)
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 8)
+            }
 
             Spacer(minLength: 8)
 

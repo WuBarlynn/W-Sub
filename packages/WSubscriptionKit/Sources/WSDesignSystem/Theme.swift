@@ -196,3 +196,16 @@ public struct WSEmptyState: View {
         .padding(.horizontal, 24)
     }
 }
+
+/// 列表/设置里的行按钮按压反馈：按下轻微缩放 + 变暗，松手回弹。
+/// 用于替代 `.buttonStyle(.plain)`（plain 没有按压反馈）。
+public struct WSPressButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.985 : 1)
+            .opacity(configuration.isPressed ? 0.6 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}

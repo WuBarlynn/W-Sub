@@ -429,6 +429,45 @@ public final class AppModel: ObservableObject {
         }
     }
 
+    // MARK: - 数据导出 / 导入（明文 JSON）
+
+    /// 导出全量数据为明文 JSON（可读、可迁移）。
+    public func exportJSON() async -> URL? {
+        guard let snapshot else { return nil }
+        await flush()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmm"
+        let name = "WSub-数据-\(formatter.string(from: Date())).json"
+        let destination = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name, isDirectory: false)
+        do {
+            let data = try SchemaMigrator.encode(snapshot)
+            try data.write(to: destination, options: .atomic)
+            return destination
+        } catch {
+            notice = AppModel.describe(error)
+            return nil
+        }
+    }
+
+    /// 从明文 JSON 导入，替换当前数据。
+    public func importJSON(from url: URL) async -> Bool {
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let data = try Data(contentsOf: url)
+            let snapshot = try SchemaMigrator.decode(data)
+            await mutate { current in
+                current = snapshot
+            }
+            notice = "已导入 \(snapshot.subscriptions.count) 条订阅"
+            return true
+        } catch {
+            flowError = "导入失败：不是有效的 W Sub 数据文件"
+            return false
+        }
+    }
+
     // MARK: - 安全设置
 
     public func changePassphrase(to newValue: String) async -> Bool {
