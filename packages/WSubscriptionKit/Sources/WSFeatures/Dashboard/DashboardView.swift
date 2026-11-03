@@ -53,8 +53,7 @@ public struct MainShellView: View {
 public struct HomeView: View {
     @EnvironmentObject private var model: AppModel
     @State private var showAdd = false
-    @State private var position: CGFloat = 0
-    @State private var cardHeight: CGFloat = 420
+    @State private var index = 0
     @State private var detail: Subscription?
 
     public init() {}
@@ -94,21 +93,6 @@ public struct HomeView: View {
         }
     }
 
-    private var currentIndex: Int {
-        min(max(0, Int(position.rounded())), max(0, items.count - 1))
-    }
-
-    /// 叠放里要画的卡：当前卡前后各一张 + 后面两张，翻页过程中新旧卡同时在队列里，
-    /// 所以不会出现「换卡那一下整体闪一下」。
-    private var visibleCards: [(item: Subscription, index: Int)] {
-        guard !items.isEmpty else { return [] }
-        let base = Int(floor(position))
-        let lower = max(0, base - 1)
-        let upper = min(items.count - 1, base + 3)
-        guard lower <= upper else { return [] }
-        return (lower...upper).map { (items[$0], $0) }
-    }
-
     public var body: some View {
         NavigationStack {
             Screen {
@@ -131,7 +115,7 @@ public struct HomeView: View {
                         Spacer(minLength: 0)
                     } else {
                         deckHeader
-                        deck
+                        SubscriptionDeck(items: items, index: $index) { detail = $0 }
                     }
                 }
                 .padding(.horizontal, WSTheme.pagePadding)
@@ -172,7 +156,7 @@ public struct HomeView: View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text("离得最近")
                 .font(.system(size: 13, weight: .semibold))
-            Text("\(currentIndex + 1) / \(items.count)")
+            Text("\(min(index + 1, items.count)) / \(items.count)")
                 .font(.system(size: 12))
                 .foregroundStyle(.tertiary)
                 .monospacedDigit()
@@ -183,52 +167,73 @@ public struct HomeView: View {
         }
         .padding(.horizontal, 4)
     }
+}
 
-    private var deck: some View {
+// MARK: - 卡片叠
+
+/// 独立成一个视图，`position` 只在这里变，父视图（支出卡那部分）不会跟着每帧重算。
+/// 卡片用固定的 zIndex 和固定的窗口范围，翻页过程中不增删视图，所以不会闪。
+private struct SubscriptionDeck: View {
+    let items: [Subscription]
+    @Binding var index: Int
+    let onSelect: (Subscription) -> Void
+
+    @State private var position: CGFloat = 0
+    @State private var cardHeight: CGFloat = 420
+
+    var body: some View {
         GeometryReader { proxy in
-            // 上面留 30pt 给后面两张卡露边，下面正好到标签栏上方
             let height = max(300, proxy.size.height - 38)
             ZStack(alignment: .top) {
-                ForEach(visibleCards, id: \.item.id) { entry in
-                    stackedCard(entry, height: height)
+                ForEach(visible, id: \.item.id) { entry in
+                    card(entry, height: height)
                 }
             }
+            .padding(.top, 30)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .clipped()
             .contentShape(Rectangle())
             .gesture(dragGesture)
             .onAppear { cardHeight = height }
             .onChange(of: height) { _, newValue in cardHeight = newValue }
-            .padding(.top, 30)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            // 只在堆叠范围内滑动：拖出边界的部分被裁掉，不会盖住上面的支出卡
-            .clipped()
+            .onChange(of: position) { _, newValue in
+                let rounded = min(max(0, Int(newValue.rounded())), max(0, items.count - 1))
+                if rounded != index { index = rounded }
+            }
         }
     }
 
-    @ViewBuilder
-    private func stackedCard(_ entry: (item: Subscription, index: Int), height: CGFloat) -> some View {
+    /// 窗口按 index 算，拖动过程中不增删卡片
+    private var visible: [(item: Subscription, index: Int)] {
+        guard !items.isEmpty else { return [] }
+        let lower = max(0, index - 1)
+        let upper = min(items.count - 1, index + 2)
+        guard lower <= upper else { return [] }
+        return (lower...upper).map { (items[$0], $0) }
+    }
+
+    private func card(_ entry: (item: Subscription, index: Int), height: CGFloat) -> some View {
         let d = CGFloat(entry.index) - position
-        let card = SubscriptionDeckCard(subscription: entry.item, depth: max(0, d))
+        return SubscriptionDeckCard(subscription: entry.item)
             .frame(height: height)
+            .overlay {
+                // 越靠后的卡压一层黑，层次连续，卡片本体不用重算
+                RoundedRectangle(cornerRadius: 26, style: .continuous)
+                    .fill(.black.opacity(0.26 * Double(min(2, max(0, d)))))
+            }
             .scaleEffect(scale(for: d), anchor: .top)
             .offset(y: offset(for: d, height: height))
-            .opacity(opacity(for: d))
-            .zIndex(Double(20 - d))
-
-        if entry.index == currentIndex {
-            card.onTapGesture { detail = entry.item }
-        } else {
-            card.allowsHitTesting(false)
-        }
+            // 固定的层级：当前卡在最上，其余按距离排，不在拖动中反复调整
+            .zIndex(-Double(abs(entry.index - index)))
+            .allowsHitTesting(entry.index == index)
+            .onTapGesture { onSelect(entry.item) }
     }
 
-    /// d = 卡片序号 − 连续位置。0 是当前卡，正数是后面的卡，负数是刚翻过去的卡。
     private func scale(for d: CGFloat) -> CGFloat {
         if d >= 0 {
-            let t = min(2, d)
-            return 1 - 0.03 * t
+            return 1 - 0.03 * min(2, d)
         } else {
-            let t = min(1, -d)
-            return 1 - 0.055 * t
+            return 1 - 0.055 * min(1, -d)
         }
     }
 
@@ -236,36 +241,32 @@ public struct HomeView: View {
         if d >= 0 {
             return -9 * min(2, d)
         } else {
-            let t = min(1, -d)
-            return -height * 1.05 * t
+            return -height * 1.05 * min(1, -d)
         }
-    }
-
-    private func opacity(for d: CGFloat) -> Double {
-        1
     }
 
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 6)
             .onChanged { value in
                 let delta = -value.translation.height / max(1, cardHeight)
-                let proposed = position + delta
-                position = rubberBand(proposed)
+                position = rubberBand(positionStart + delta)
             }
             .onEnded { value in
                 let projected = position - value.predictedEndTranslation.height / max(1, cardHeight) * 0.35
-                var target = projected.rounded()
-                if abs(value.predictedEndTranslation.height) < 90 {
-                    target = position.rounded()
-                }
+                var target = abs(value.predictedEndTranslation.height) < 90
+                    ? position.rounded()
+                    : projected.rounded()
                 target = min(max(0, target), CGFloat(max(0, items.count - 1)))
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) {
                     position = target
                 }
+                positionStart = target
             }
     }
 
-    /// 到头了继续拖会有阻尼，回弹自然
+    /// 拖动开始时记下起点，避免把每帧的增量累加到已经变化过的 position 上
+    @State private var positionStart: CGFloat = 0
+
     private func rubberBand(_ value: CGFloat) -> CGFloat {
         let maxIndex = CGFloat(max(0, items.count - 1))
         if value < 0 { return value * 0.28 }
@@ -411,7 +412,6 @@ private struct YearProgressCard: View {
 
 private struct SubscriptionDeckCard: View {
     let subscription: Subscription
-    var depth: CGFloat = 0
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -422,10 +422,7 @@ private struct SubscriptionDeckCard: View {
         colorScheme == .dark ? Color(hex: "#2A2C34") : Color(hex: "#141519")
     }
 
-    /// 越靠后的卡叠一层黑，层次自然，也不用给每张卡准备一套颜色
-    private var dimming: Double {
-        0.26 * Double(min(2, max(0, depth)))
-    }
+
 
     private var bandText: Color { Color(hex: "#16171B") }
 
@@ -439,10 +436,6 @@ private struct SubscriptionDeckCard: View {
         .overlay {
             RoundedRectangle(cornerRadius: 26, style: .continuous)
                 .strokeBorder(.white.opacity(colorScheme == .dark ? 0.12 : 0.05), lineWidth: 0.5)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .fill(.black.opacity(dimming))
         }
         .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))

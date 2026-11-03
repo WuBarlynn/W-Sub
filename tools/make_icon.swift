@@ -70,6 +70,14 @@ if variant == "renew" {
     let outerStart = tailAngle + chisel
     let innerEnd = tailAngle - chisel
 
+    // 以缺口中心（-45°）为轴做镜像：缺口还留在右下角，箭头方向反过来
+    ctx.saveGState()
+    ctx.translateBy(x: center.x, y: center.y)
+    ctx.rotate(by: radians(-45))
+    ctx.scaleBy(x: 1, y: -1)
+    ctx.rotate(by: radians(45))
+    ctx.translateBy(x: -center.x, y: -center.y)
+
     // 环身：上沿从斜切口逆时针绕到箭头根部，再沿内沿绕回
     let ring = CGMutablePath()
     ring.move(to: point(innerEnd, radius - halfWidth))
@@ -93,6 +101,8 @@ if variant == "renew" {
     head.closeSubpath()
     ctx.addPath(head)
     ctx.fillPath()
+
+    ctx.restoreGState()
 }
 
 guard let image = ctx.makeImage() else { exit(1) }
