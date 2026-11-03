@@ -43,13 +43,49 @@ public struct FolderAccess: Sendable {
     }
 
     /// 每次 IO 单独获取/释放作用域，避免同时占用过多 scoped resource。
+    ///
+    /// 注意 `startAccessingSecurityScopedResource()` 返回 false **不等于没有权限**：
+    /// 对不需要作用域的 URL（App 容器内、部分文件提供者返回的 URL，iCloud 云盘常见）
+    /// 它就是这样返回，但读写照样成功。所以不把 false 当失败，真正的失败交给后面的 IO 报错，
+    /// 并且把「权限不足」统一翻译成 folderPermissionLost，避免弹出看不懂的系统错误。
     public func withAccess<T>(_ body: (URL) throws -> T) throws -> T {
         guard mode == .securityScoped else { return try body(url) }
-        guard url.startAccessingSecurityScopedResource() else {
-            throw VaultError(.folderPermissionLost)
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            return try body(url)
+        } catch let error as VaultError {
+            throw error
+        } catch {
+            let nsError = error as NSError
+            if nsError.domain == NSCocoaErrorDomain,
+               nsError.code == NSFileReadNoPermissionError
+                || nsError.code == NSFileWriteNoPermissionError
+                || nsError.code == NSFileReadUnknownError
+                || nsError.code == NSFileWriteUnknownError {
+                throw VaultError(.folderPermissionLost)
+            }
+            throw error
         }
-        defer { url.stopAccessingSecurityScopedResource() }
-        return try body(url)
+    }
+
+    /// 选完目录立刻做一次真实写入测试。iCloud 里别人共享给你的文件夹、部分第三方文件
+    /// 提供者的目录是只读的，早点说清楚，比建库进行到一半再失败要好。
+    public func verifyWritable() throws {
+        try withAccess { directory in
+            var isDirectory: ObjCBool = false
+            guard FileManager.default.fileExists(atPath: directory.path, isDirectory: &isDirectory),
+                  isDirectory.boolValue else {
+                throw VaultError(.folderPermissionLost)
+            }
+            let probe = directory.appendingPathComponent(".wsub-write-test-\(UUID().uuidString)")
+            do {
+                try Data([0x0]).write(to: probe, options: .atomic)
+            } catch {
+                throw VaultError(.notWritableFolder)
+            }
+            try? FileManager.default.removeItem(at: probe)
+        }
     }
 
     public func probe() -> Bool {

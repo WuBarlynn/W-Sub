@@ -41,6 +41,9 @@ cd packages/WSubscriptionKit && swift test --disable-sandbox    # 51 个测试
   4. 底部一行入口跳到订阅页。
 - **订阅页是清单**（系统分组列表 + 搜索 + 按时间/分类切换），和概览页刻意保持两种形态，不重复。
 - 设置页与引导页只留控件和一句话，不写说明文案。
+- **文件夹可以选 iCloud 云盘**（含「我的 iPhone」、第三方文件提供者）。这依赖 Info.plist 里的
+  `LSSupportsOpeningDocumentsInPlace = YES` 与选择器的 `asCopy: false`，两者缺一都会让 iCloud
+  目录在选择器里变成灰色不可选。
 - 详情页有**扣款时间线**：过去两笔 + 未来三笔。
 
 ## 图标

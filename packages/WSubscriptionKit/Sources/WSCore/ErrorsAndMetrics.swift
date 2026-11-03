@@ -3,6 +3,7 @@ import Foundation
 public struct VaultError: Error, LocalizedError, Sendable, Equatable {
     public enum Kind: Sendable, Equatable {
         case folderPermissionLost
+        case notWritableFolder
         case vaultNotFound
         case wrongCredential
         case biometryUnavailable
@@ -26,6 +27,7 @@ public struct VaultError: Error, LocalizedError, Sendable, Equatable {
     public var errorDescription: String? {
         switch kind {
         case .folderPermissionLost: return "文件夹访问权限已失效，可能被移动或删除了"
+        case .notWritableFolder: return "这个文件夹不能写入"
         case .vaultNotFound: return "所选文件夹里没有找到数据文件"
         case .wrongCredential: return "密码不正确"
         case .biometryUnavailable: return "此设备暂时无法使用生物识别"
@@ -42,6 +44,7 @@ public struct VaultError: Error, LocalizedError, Sendable, Equatable {
     public var recoverySuggestion: String? {
         switch kind {
         case .folderPermissionLost: return "重新选择同一个文件夹即可恢复"
+        case .notWritableFolder: return "换一个文件夹。iCloud 云盘里别人共享给你的文件夹通常是只读的"
         case .vaultNotFound: return "选择包含 WSubscription.vault 的文件夹，或新建一个"
         case .wrongCredential: return "再试一次，或使用 Face ID / 恢复码解锁"
         case .biometryUnavailable: return "改用密码解锁"

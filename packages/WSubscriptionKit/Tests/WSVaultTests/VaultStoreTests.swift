@@ -35,6 +35,36 @@ final class VaultStoreTests: XCTestCase {
                           deviceID: UUID())
     }
 
+    // MARK: - 文件夹授权（iCloud 云盘）
+
+    /// 回归：`startAccessingSecurityScopedResource()` 返回 false 只说明「这个 URL 不需要作用域」，
+    /// 不代表没有权限。旧实现把 false 当失败，iCloud 云盘这类目录会被一律判成「权限已失效」。
+    func testSecurityScopedAccessToleratesMissingScopeFlag() throws {
+        let access = FolderAccess(url: directory, mode: .securityScoped)
+        XCTAssertNoThrow(try access.verifyWritable())
+        XCTAssertTrue(access.probe())
+    }
+
+    func testReadOnlyFolderIsRejectedBeforeCreatingVault() throws {
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: directory.path)
+        defer {
+            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: directory.path)
+        }
+
+        let access = FolderAccess(url: directory, mode: .securityScoped)
+        XCTAssertThrowsError(try access.verifyWritable()) { error in
+            XCTAssertEqual((error as? VaultError)?.kind, .notWritableFolder)
+        }
+    }
+
+    func testBookmarkRoundTripKeepsFolderUsable() throws {
+        let bookmark = try FolderAccess.bookmark(for: directory)
+        let access = try FolderAccess.from(bookmark: bookmark)
+        XCTAssertFalse(access.isStale)
+        XCTAssertTrue(access.probe())
+        XCTAssertNoThrow(try access.verifyWritable())
+    }
+
     private func sampleSnapshot() -> VaultSnapshot {
         var snapshot = VaultSnapshot()
         snapshot.settings.primaryCurrency = "CNY"

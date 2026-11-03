@@ -3,6 +3,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import WSDesignSystem
 import WSCore
+import WSVault
 
 public struct OnboardingView: View {
     @EnvironmentObject private var model: AppModel
@@ -14,7 +15,6 @@ public struct OnboardingView: View {
     @State private var useBiometry = true
     @State private var recoveryCode: String?
     @State private var acknowledged = false
-    @State private var showImporter = false
     @State private var isWorking = false
     @State private var localError: String?
 
@@ -41,18 +41,37 @@ public struct OnboardingView: View {
                 footer
             }
         }
-        .fileImporter(isPresented: $showImporter,
-                      allowedContentTypes: [.folder],
-                      allowsMultipleSelection: false) { result in
-            switch result {
-            case .success(let urls):
-                guard let url = urls.first else { return }
-                directory = url
-                localError = nil
-                withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
-            case .failure(let error):
-                localError = error.localizedDescription
+        .task {
+            #if DEBUG
+            // 调试用：-ws-picker 直接打开文件夹选择器，方便在没有 UI 自动化时验证授权流程
+            if ProcessInfo.processInfo.arguments.contains("-ws-picker") {
+                step = 1
+                try? await Task.sleep(for: .seconds(1))
+                presentPicker()
             }
+            #endif
+        }
+    }
+
+    private func presentPicker() {
+        localError = nil
+        FolderPickerPresenter.present { url in
+            accept(url)
+        } onCancel: {}
+    }
+
+    /// 选完立刻验证一次：目录 + 可写。iCloud 里只读的共享文件夹到这里就会被挡住，
+    /// 不会等到「创建」按钮按下去才失败。
+    private func accept(_ url: URL) {
+        localError = nil
+        do {
+            let access = FolderAccess(url: url, mode: .securityScoped)
+            try access.verifyWritable()
+            directory = url
+            model.clearMessages()
+            withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
+        } catch {
+            localError = AppModel.describe(error)
         }
     }
 
@@ -157,7 +176,7 @@ public struct OnboardingView: View {
                 primary("开始") { advance() }
             case 1:
                 primary(directory == nil ? "选择文件夹" : "下一步", enabled: true) {
-                    if directory == nil { showImporter = true } else { advance() }
+                    if directory == nil { presentPicker() } else { advance() }
                 }
             case 2:
                 primary(isWorking ? "创建中…" : "创建", enabled: canCreate) {
@@ -171,7 +190,7 @@ public struct OnboardingView: View {
             }
 
             if step == 1, directory != nil {
-                Button("重新选择") { showImporter = true }
+                Button("重新选择") { presentPicker() }
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
