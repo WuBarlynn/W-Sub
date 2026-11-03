@@ -21,11 +21,12 @@ open apps/ios/WSubscription.xcodeproj      # 选 iPhone 模拟器，⌘R
 | `-ws-demo` | 用示例数据在临时目录建一个保险箱并自动解锁 |
 | `-ws-tab library` | 直接打开某个标签页（`dashboard` / `library` / `stats` / `settings`） |
 | `-ws-lock` | 建库后立刻锁定，用来看锁屏；密码 `demo-pass` |
+| `-ws-picker` | 直接弹出文件夹选择器，用来验证 iCloud / 文件提供者的授权流程 |
 
 不加参数就是真实首次启动：选文件夹 → 设密码 → 存恢复码 → 可选 Face ID。
 
 ```bash
-cd packages/WSubscriptionKit && swift test --disable-sandbox    # 51 个测试
+cd packages/WSubscriptionKit && swift test --disable-sandbox    # 54 个测试
 ```
 
 ## 界面
