@@ -226,7 +226,7 @@ private struct SubscriptionDeck: View {
             .overlay {
                 if d > 0 {
                     RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .fill(.black.opacity(0.22 * Double(min(2, d))))
+                        .fill(Color.primary.opacity(0.10 * Double(min(2, d))))
                         .allowsHitTesting(false)
                 }
             }
@@ -480,14 +480,12 @@ private struct SubscriptionDeckCard: View, Equatable {
 
     private var isActive: Bool { subscription.state == .active }
 
-    /// 深色卡片本体；浅色模式下页面是浅灰，卡片要足够黑才立得住。
+    /// 卡片本体跟随主题：浅色模式浅色卡、深色模式深灰卡。
     private var surface: Color {
-        colorScheme == .dark ? Color(hex: "#2A2C34") : Color(hex: "#141519")
+        Color.wsCard
     }
 
-
-
-    private var bandText: Color { Color(hex: "#16171B") }
+    private var bandText: Color { .primary }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -498,7 +496,7 @@ private struct SubscriptionDeckCard: View, Equatable {
         .background(surface)
         .overlay {
             RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .strokeBorder(.white.opacity(colorScheme == .dark ? 0.12 : 0.05), lineWidth: 0.5)
+                .strokeBorder(Color.wsHairline, lineWidth: 0.5)
         }
         .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
@@ -540,7 +538,7 @@ private struct SubscriptionDeckCard: View, Equatable {
         .padding(.horizontal, 14)
         .frame(height: 62)
         .frame(maxWidth: .infinity)
-        .background(.white.opacity(colorScheme == .dark ? 0.88 : 0.92))
+        .background(colorScheme == .dark ? Color.white.opacity(0.08) : Color.primary.opacity(0.06))
         // 顶部横条覆盖卡片顶部两个圆角，避免圆角处露出深色背景形成黑边
         .clipShape(UnevenRoundedRectangle(topLeadingRadius: 32, bottomLeadingRadius: 0,
                                           bottomTrailingRadius: 0, topTrailingRadius: 32,
@@ -562,14 +560,14 @@ private struct SubscriptionDeckCard: View, Equatable {
             HStack(alignment: .firstTextBaseline) {
                 Text(isActive ? (subscription.isTrial ? "试用结束后" : "下次扣款") : "订阅状态")
                     .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
                 Spacer(minLength: 8)
                 Text(countdown)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(countdownTint)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
-                    .background(.white.opacity(0.09),
+                    .background(Color.primary.opacity(0.06),
                                 in: RoundedRectangle(cornerRadius: 6, style: .continuous))
             }
             .padding(.top, 16)
@@ -578,12 +576,12 @@ private struct SubscriptionDeckCard: View, Equatable {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(subscription.price.formatted())
                         .font(.wsNumber(38, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                     Text(dailyLine)
                         .font(.system(size: 11))
-                        .foregroundStyle(.white.opacity(0.38))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
@@ -594,21 +592,21 @@ private struct SubscriptionDeckCard: View, Equatable {
                     VStack(spacing: 3) {
                     ZStack {
                         Circle()
-                            .stroke(.white.opacity(0.12), lineWidth: 6)
+                            .stroke(Color.primary.opacity(0.12), lineWidth: 6)
                         Circle()
                             .trim(from: 0, to: progress.fraction)
-                            .stroke(.white.opacity(0.9),
+                            .stroke(WSTheme.accent,
                                     style: StrokeStyle(lineWidth: 6, lineCap: .round))
                             .rotationEffect(.degrees(-90))
                         Text("\(Int(progress.fraction * 100))%")
                             .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.85))
+                            .foregroundStyle(.primary)
                             .monospacedDigit()
                     }
                     .frame(width: 58, height: 58)
                     Text("本期")
                         .font(.system(size: 9))
-                        .foregroundStyle(.white.opacity(0.34))
+                        .foregroundStyle(.tertiary)
                     }
                 }
             }
@@ -618,19 +616,19 @@ private struct SubscriptionDeckCard: View, Equatable {
                 VStack(alignment: .leading, spacing: 7) {
                     Text("接下来")
                         .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.32))
+                        .foregroundStyle(.tertiary)
                     ForEach(upcoming, id: \.self) { date in
                         HStack(spacing: 8) {
                             Circle()
-                                .fill(.white.opacity(0.22))
+                                .fill(Color.primary.opacity(0.2))
                                 .frame(width: 4, height: 4)
                             Text(WSDate.monthDayWithYear(date))
                                 .font(.system(size: 11))
-                                .foregroundStyle(.white.opacity(0.5))
+                                .foregroundStyle(.secondary)
                             Spacer(minLength: 8)
                             Text(subscription.price.formatted())
                                 .font(.wsNumber(11, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.62))
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -640,7 +638,7 @@ private struct SubscriptionDeckCard: View, Equatable {
             Spacer(minLength: 14)
 
             Rectangle()
-                .fill(.white.opacity(0.08))
+                .fill(Color.wsHairline)
                 .frame(height: 0.5)
                 .padding(.bottom, 12)
 
@@ -658,22 +656,22 @@ private struct SubscriptionDeckCard: View, Equatable {
                       ? "arrow.triangle.2.circlepath"
                       : "pause.circle")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.62))
+                    .foregroundStyle(.secondary)
                 Text(isActive ? categoryName : subscription.state.displayName)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.78))
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text("·")
                     .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
                 Text(reminderText)
                     .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                 Spacer(minLength: 0)
                 Text(subscription.cycle.shortLabel)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.72))
+                    .foregroundStyle(.primary)
             }
             .padding(.horizontal, 12)
             .frame(height: 34)
@@ -695,10 +693,10 @@ private struct SubscriptionDeckCard: View, Equatable {
         VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.36))
+                .foregroundStyle(.tertiary)
             Text(value)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -793,11 +791,11 @@ private struct SubscriptionDeckCard: View, Equatable {
     }
 
     private var countdownTint: Color {
-        guard isActive else { return .white.opacity(0.55) }
+        guard isActive else { return .secondary }
         if subscription.isTrial { return Color(hex: "#C9A6FF") }
-        guard let days = subscription.daysUntilNextBilling() else { return .white.opacity(0.55) }
+        guard let days = subscription.daysUntilNextBilling() else { return .secondary }
         if days <= 3 { return Color(hex: "#FF9B7A") }
-        return .white.opacity(0.62)
+        return .secondary
     }
 }
 
