@@ -47,22 +47,44 @@ public struct MainShellView: View {
 
 // MARK: - 概览
 
-/// 概览页回答三个问题：下一笔什么时候扣、这个月花了多少、后面还排着几笔。
-/// 完整的订阅清单不在这里重复，那是「订阅」页的职责。
+/// 概览 = 顶部两张白色支出卡 + 下面一叠黑色订阅卡。
+/// 黑色卡片是真的叠在一起：后面两张缩小、往上露边，上滑把最上面一张翻走，
+/// 最上面永远是离得最近的一笔扣款，翻到底就是最晚的一笔。
+/// 卡片底部会一直延伸到底部标签栏后面，不在栏上面被切断。
 public struct HomeView: View {
     @EnvironmentObject private var model: AppModel
     @State private var showAdd = false
+    @State private var index = 0
+    @State private var drag: CGFloat = 0
+    @State private var detail: Subscription?
 
     public init() {}
 
     private var snapshot: VaultSnapshot { model.snapshot ?? VaultSnapshot() }
     private var currency: String { snapshot.settings.primaryCurrency }
 
-    /// 已经发生的扣款先不算，只取未来 5 笔：第一笔做主角，其余做时间轴。
-    private var upcoming: [UpcomingRenewal] { snapshot.nearest(after: Date(), limit: 5) }
-    private var laterUpcoming: [UpcomingRenewal] { Array(upcoming.dropFirst().prefix(4)) }
+    private var items: [Subscription] {
+        snapshot.subscriptions.sorted { lhs, rhs in
+            if lhs.state != .active || rhs.state != .active {
+                if lhs.state == rhs.state { return lhs.name < rhs.name }
+                return lhs.state == .active
+            }
+            let left = lhs.nextBillingDate() ?? .distantFuture
+            let right = rhs.nextBillingDate() ?? .distantFuture
+            if left == right { return lhs.name < rhs.name }
+            return left < right
+        }
+    }
 
     private var monthlyPoints: [MonthPoint] { snapshot.monthlySpend(monthsBack: 6) }
+
+    private var monthDelta: Double? {
+        guard monthlyPoints.count >= 2 else { return nil }
+        let previous = monthlyPoints[monthlyPoints.count - 2].amount.minorUnits
+        guard previous > 0 else { return nil }
+        let current = monthlyPoints[monthlyPoints.count - 1].amount.minorUnits
+        return Double(current - previous) / Double(previous)
+    }
 
     private var pendingThisYear: Int {
         let calendar = Calendar.ws
@@ -73,34 +95,43 @@ public struct HomeView: View {
         }
     }
 
+    private var stack: [(item: Subscription, depth: Int)] {
+        guard !items.isEmpty else { return [] }
+        let start = min(max(0, index), items.count - 1)
+        let end = min(start + 3, items.count)
+        return (start..<end).map { (items[$0], $0 - start) }
+    }
+
     public var body: some View {
         NavigationStack {
             Screen {
-                ScrollView {
-                    VStack(spacing: 14) {
-                        if snapshot.subscriptions.isEmpty {
-                            emptyCard
-                        } else {
-                            hero
-                            HStack(alignment: .top, spacing: 12) {
-                                SpendTrendCard(points: monthlyPoints,
-                                               total: monthlyPoints.last?.amount ?? .zero(currency))
-                                YearProgressCard(remaining: snapshot.remainingThisYear(),
-                                                 pendingCount: pendingThisYear)
-                            }
-                            if !laterUpcoming.isEmpty {
-                                TimelineSection(renewals: laterUpcoming, snapshot: snapshot)
-                            }
-                            allSubscriptionsLink
-                        }
+                VStack(spacing: 12) {
+                    HStack(alignment: .top, spacing: 12) {
+                        SpendTrendCard(points: monthlyPoints,
+                                       total: monthlyPoints.last?.amount ?? .zero(currency),
+                                       delta: monthDelta)
+                        YearProgressCard(remaining: snapshot.remainingThisYear(),
+                                         pendingCount: pendingThisYear)
                     }
-                    .padding(.horizontal, WSTheme.pagePadding)
-                    .padding(.top, 2)
-                    .padding(.bottom, 28)
+
+                    if items.isEmpty {
+                        SurfaceCard {
+                            WSEmptyState(symbol: "plus.circle",
+                                         title: "还没有订阅",
+                                         message: "点右上角添加一项",
+                                         actionTitle: "添加订阅") { showAdd = true }
+                        }
+                        Spacer(minLength: 0)
+                    } else {
+                        deckHeader
+                        deck
+                    }
                 }
-                .scrollIndicators(.hidden)
+                .padding(.horizontal, WSTheme.pagePadding)
+                .padding(.top, 6)
             }
             .navigationTitle(AppTab.dashboard.title)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -121,203 +152,105 @@ public struct HomeView: View {
                     .accessibilityLabel("添加订阅")
                 }
             }
+            .navigationDestination(item: $detail) { item in
+                SubscriptionDetailView(subscription: item)
+            }
             .sheet(isPresented: $showAdd) {
                 TemplatePickerView()
             }
         }
     }
 
-    @ViewBuilder
-    private var hero: some View {
-        if let next = upcoming.first {
-            NavigationLink {
-                SubscriptionDetailView(subscription: next.subscription)
-            } label: {
-                NextRenewalCard(renewal: next)
-            }
-            .buttonStyle(.plain)
-        } else {
-            SurfaceCard {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("没有进行中的订阅")
-                        .font(.system(size: 15, weight: .medium))
-                    Text("添加一条，这里会显示下一笔扣款")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+    private var deckHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text("离得最近")
+                .font(.system(size: 13, weight: .semibold))
+            Text("\(min(index + 1, items.count)) / \(items.count)")
+                .font(.system(size: 12))
+                .foregroundStyle(.tertiary)
+                .monospacedDigit()
+            Spacer(minLength: 8)
+            Text("上滑翻到下一张")
+                .font(.system(size: 11))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private var deck: some View {
+        GeometryReader { proxy in
+            // 多出来的 44pt 让卡片一直延伸到底部标签栏后面，而不是在栏上方被截断
+            let cardHeight = proxy.size.height + 44
+            ZStack(alignment: .top) {
+                ForEach(stack, id: \.item.id) { entry in
+                    stackedCard(entry, height: cardHeight)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .top)
+        }
+        .padding(.top, 30)
+    }
+
+    @ViewBuilder
+    private func stackedCard(_ entry: (item: Subscription, depth: Int), height: CGFloat) -> some View {
+        let card = SubscriptionDeckCard(subscription: entry.item, depth: entry.depth)
+            .frame(height: height)
+            .scaleEffect(scale(for: entry.depth), anchor: .top)
+            .offset(y: offset(for: entry.depth) + (entry.depth == 0 ? drag : 0))
+            .zIndex(Double(10 - entry.depth))
+
+        if entry.depth == 0 {
+            card
+                .gesture(dragGesture)
+                .onTapGesture { detail = entry.item }
+        } else {
+            card.allowsHitTesting(false)
         }
     }
 
-    private var emptyCard: some View {
-        SurfaceCard {
-            WSEmptyState(symbol: "plus.circle",
-                         title: "还没有订阅",
-                         message: "点右上角添加一项",
-                         actionTitle: "添加订阅") { showAdd = true }
+    private func scale(for depth: Int) -> CGFloat {
+        switch depth {
+        case 0: return 1
+        case 1: return 0.945
+        default: return 0.89
         }
     }
 
-    private var allSubscriptionsLink: some View {
-        Button {
-            model.selectedTab = .library
-        } label: {
-            HStack(spacing: 8) {
-                Text("全部 \(snapshot.subscriptions.count) 项订阅")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.primary)
-                Spacer(minLength: 8)
-                Text("按时间与分类")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.tertiary)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 50)
-            .frame(maxWidth: .infinity)
-            .background(Color.wsCard, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.wsHairline, lineWidth: 0.5)
-            }
+    private func offset(for depth: Int) -> CGFloat {
+        switch depth {
+        case 0: return 0
+        case 1: return -16
+        default: return -30
         }
-        .buttonStyle(.plain)
     }
-}
 
-// MARK: - 下一笔（主卡）
-
-/// 首页的头号卡片：深色底，把「哪一天、多少钱、什么周期」一次说清。
-/// 颜色固定为石墨色，明暗模式下都成立，也不会随品牌色变成奇怪的颜色。
-private struct NextRenewalCard: View {
-    let renewal: UpcomingRenewal
-
-    @Environment(\.colorScheme) private var scheme
-
-    private var sub: Subscription { renewal.subscription }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("下一笔扣款")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.55))
-                Spacer(minLength: 8)
-                Text(WSDate.monthDay(renewal.date))
-                    .font(.system(size: 12))
-                    .foregroundStyle(.white.opacity(0.42))
+    private var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 6)
+            .onChanged { value in
+                drag = min(0, value.translation.height)
             }
-
-            HStack(spacing: 13) {
-                IconTile(brand: sub.brandID,
-                         symbol: sub.symbolName,
-                         hex: sub.tintHex,
-                         name: sub.name,
-                         customID: sub.customIconID,
-                         size: 58)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Text(sub.name)
-                            .font(.system(size: 19, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                        if sub.isTrial, !sub.name.contains("试用") {
-                            Text("试用")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.white.opacity(0.16),
-                                            in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .onEnded { value in
+                if value.translation.height < -70, index < items.count - 1 {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.9)) {
+                        drag = -900
+                    }
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(210))
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            index = min(index + 1, items.count - 1)
+                            drag = 0
                         }
                     }
-                    Text(meta)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.55))
-                        .lineLimit(1)
+                } else {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        drag = 0
+                    }
                 }
-
-                Spacer(minLength: 8)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.3))
             }
-            .padding(.top, 15)
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(sub.price.formatted())
-                    .font(.wsNumber(30, weight: .bold))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-                Text(countdown)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.6))
-                Spacer(minLength: 0)
-            }
-            .padding(.top, 13)
-
-            Rectangle()
-                .fill(.white.opacity(0.10))
-                .frame(height: 0.5)
-                .padding(.vertical, 13)
-
-            HStack(spacing: 10) {
-                stat("上次扣款", sub.lastBillingDate().map { WSDate.monthDay($0) } ?? "—")
-                stat("月均", sub.cycle.isOneTime ? "—" : sub.monthlyEquivalent.formatted())
-                stat("每年", sub.cycle.isOneTime ? "—" : sub.annualEquivalent.formatted())
-            }
-        }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(scheme == .dark ? Color(hex: "#1D222C") : Color(hex: "#171B22"),
-                    in: RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous)
-                .strokeBorder(.white.opacity(scheme == .dark ? 0.10 : 0.06), lineWidth: 0.5)
-        }
-        .contentShape(RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
-    }
-
-    private var meta: String {
-        let cycle = sub.cycle.displayName
-        return sub.vendor.isEmpty ? cycle : "\(sub.vendor) · \(cycle)"
-    }
-
-    private var countdown: String {
-        if sub.isTrial {
-            // 名字里已经带了「试用」就不再重复一遍
-            let prefix = sub.name.contains("试用") ? "" : "试用"
-            return renewal.daysAway <= 0 ? "\(prefix)今天结束" : "\(prefix)还剩 \(renewal.daysAway) 天"
-        }
-        switch renewal.daysAway {
-        case ..<0: return "已到期"
-        case 0: return "今天扣款"
-        case 1: return "明天扣款"
-        default: return "\(renewal.daysAway) 天后"
-        }
-    }
-
-    private func stat(_ title: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.4))
-            Text(value)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.92))
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-// MARK: - 并排两张较高的数据卡
+// MARK: - 顶部：两张白色支出卡
 
 private struct TallStatCard<Content: View>: View {
     let title: String
@@ -337,7 +270,7 @@ private struct TallStatCard<Content: View>: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .topLeading)
-        .frame(height: 152, alignment: .topLeading)
+        .frame(height: 136, alignment: .topLeading)
         .background(Color.wsCard, in: RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous)
@@ -346,31 +279,25 @@ private struct TallStatCard<Content: View>: View {
     }
 }
 
-/// 本月支出 + 近 6 个月小柱状图 + 环比。
 private struct SpendTrendCard: View {
     let points: [MonthPoint]
     let total: Money
+    let delta: Double?
 
     @Environment(\.colorScheme) private var scheme
 
     private var peak: Int64 { max(1, points.map(\.amount.minorUnits).max() ?? 1) }
 
-    private var delta: Double? {
-        guard points.count >= 2 else { return nil }
-        let previous = points[points.count - 2].amount.minorUnits
-        guard previous > 0 else { return nil }
-        return Double(points[points.count - 1].amount.minorUnits - previous) / Double(previous)
-    }
-
     var body: some View {
         TallStatCard(title: "本月支出") {
             Text(total.formatted())
                 .font(.wsNumber(21, weight: .semibold))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .padding(.top, 3)
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 8)
 
             HStack(alignment: .bottom, spacing: 4) {
                 ForEach(points) { point in
@@ -378,13 +305,13 @@ private struct SpendTrendCard: View {
                     let isCurrent = point.id == points.last?.id
                     RoundedRectangle(cornerRadius: 2.5, style: .continuous)
                         .fill(isCurrent ? WSTheme.accent : WSTheme.accent.opacity(scheme == .dark ? 0.34 : 0.18))
-                        .frame(height: max(4, 34 * ratio))
+                        .frame(height: max(4, 30 * ratio))
                         .frame(maxWidth: .infinity)
                 }
             }
-            .frame(height: 34, alignment: .bottom)
+            .frame(height: 30, alignment: .bottom)
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 8)
 
             HStack(spacing: 3) {
                 if let delta {
@@ -404,7 +331,6 @@ private struct SpendTrendCard: View {
     }
 }
 
-/// 今年剩余 + 年进度环 + 待扣笔数。
 private struct YearProgressCard: View {
     let remaining: Money
     let pendingCount: Int
@@ -421,11 +347,12 @@ private struct YearProgressCard: View {
         TallStatCard(title: "今年剩余") {
             Text(remaining.formatted())
                 .font(.wsNumber(21, weight: .semibold))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .padding(.top, 3)
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 8)
 
             HStack(spacing: 10) {
                 ZStack {
@@ -433,15 +360,15 @@ private struct YearProgressCard: View {
                         .stroke(WSTheme.accent.opacity(0.14), lineWidth: 5)
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(WSTheme.accent,
-                                style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                        .stroke(WSTheme.accent, style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                 }
-                .frame(width: 40, height: 40)
+                .frame(width: 38, height: 38)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("\(pendingCount) 笔待扣")
                         .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     Text("今年已过 \(Int(progress * 100))%")
@@ -451,127 +378,183 @@ private struct YearProgressCard: View {
                 }
             }
 
-            Spacer(minLength: 4)
+            Spacer(minLength: 2)
         }
     }
 }
 
-// MARK: - 后续扣款时间轴
+// MARK: - 黑色订阅卡（可叠放）
 
-private struct TimelineSection: View {
-    let renewals: [UpcomingRenewal]
-    let snapshot: VaultSnapshot
+private struct SubscriptionDeckCard: View {
+    let subscription: Subscription
+    var depth: Int = 0
 
-    private var total: Money {
-        let code = snapshot.primaryCurrency
-        return renewals.reduce(Money.zero(code)) { sum, item in
-            sum + snapshot.convert(item.subscription.price, to: code)
+    private var isActive: Bool { subscription.state == .active }
+
+    @Environment(\.colorScheme) private var scheme
+
+    private var surface: Color {
+        // 深色模式下页面本来就是黑的，卡片要略微提亮才看得出是一张卡
+        switch (depth, scheme) {
+        case (0, .dark): return Color(hex: "#1A1B20")
+        case (1, .dark): return Color(hex: "#24252C")
+        case (_, .dark): return Color(hex: "#2E2F38")
+        case (0, _): return Color(hex: "#111216")
+        case (1, _): return Color(hex: "#1E1F25")
+        default: return Color(hex: "#2B2C34")
         }
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("后续扣款")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer(minLength: 8)
-                Text("\(renewals.count) 笔 · \(total.formatted())")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 4)
+    private var primaryText: Color { .white }
+    private var secondaryText: Color { .white.opacity(0.55) }
+    private var tertiaryText: Color { .white.opacity(0.38) }
 
-            SurfaceCard(padding: 0) {
-                VStack(spacing: 0) {
-                    ForEach(Array(renewals.enumerated()), id: \.element.id) { index, item in
-                        NavigationLink {
-                            SubscriptionDetailView(subscription: item.subscription)
-                        } label: {
-                            TimelineRow(renewal: item,
-                                        isFirst: index == 0,
-                                        isLast: index == renewals.count - 1)
-                        }
-                        .buttonStyle(.plain)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                IconTile(brand: subscription.brandID,
+                         symbol: subscription.symbolName,
+                         hex: subscription.tintHex,
+                         name: subscription.name,
+                         customID: subscription.customIconID,
+                         size: 56)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(subscription.name)
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(primaryText)
+                        .lineLimit(1)
+                    Text(meta)
+                        .font(.system(size: 12))
+                        .foregroundStyle(secondaryText)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(subscription.cycle.shortLabel)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(.white.opacity(0.10),
+                                in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+            }
+
+            Spacer(minLength: 16)
+
+            Text(isActive ? (subscription.isTrial ? "试用结束后" : "下次扣款") : "订阅状态")
+                .font(.system(size: 11))
+                .foregroundStyle(tertiaryText)
+
+            HStack(alignment: .firstTextBaseline, spacing: 9) {
+                Text(subscription.price.formatted())
+                    .font(.wsNumber(42, weight: .bold))
+                    .foregroundStyle(primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+                Text(countdown)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(countdownTint)
+                    .lineLimit(1)
+            }
+            .padding(.top, 2)
+
+            Spacer(minLength: 18)
+
+            HStack(alignment: .top, spacing: 10) {
+                stat("周期", subscription.cycle.displayName)
+                stat("上次扣款", subscription.lastBillingDate().map { WSDate.monthDay($0) } ?? "—")
+                stat("下次扣款", subscription.nextBillingDate().map { WSDate.monthDay($0) } ?? "—")
+            }
+            .padding(.bottom, 14)
+
+            if let progress {
+                GeometryReader { proxy in
+                    ZStack(alignment: .leading) {
+                        Capsule(style: .continuous)
+                            .fill(.white.opacity(0.12))
+                        Capsule(style: .continuous)
+                            .fill(.white.opacity(0.85))
+                            .frame(width: max(4, proxy.size.width * progress.fraction))
                     }
                 }
-                .padding(.vertical, 2)
+                .frame(height: 5)
             }
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        // 卡片本身铺到屏幕底部（标签栏后面），但内容要留在标签栏上方
+        .padding(.bottom, 104)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(surface, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .strokeBorder(.white.opacity(depth == 0 ? 0.06 : 0.10), lineWidth: 0.5)
+        }
+        .opacity(isActive ? 1 : 0.75)
+        .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
     }
-}
 
-private struct TimelineRow: View {
-    let renewal: UpcomingRenewal
-    let isFirst: Bool
-    let isLast: Bool
-
-    private var sub: Subscription { renewal.subscription }
-    private let rowHeight: CGFloat = 58
-
-    var body: some View {
-        HStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(dayText)
-                    .font(.system(size: 12, weight: .semibold))
-                    .monospacedDigit()
-                Text(weekText)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.secondary)
-            }
-            .frame(width: 38, alignment: .leading)
-
-            ZStack {
-                if !isLast {
-                    Rectangle()
-                        .fill(Color.wsHairline)
-                        .frame(width: 1, height: rowHeight)
-                        .offset(y: rowHeight / 2)
-                }
-                Circle()
-                    .fill(isFirst ? WSTheme.accent : Color.secondary.opacity(0.3))
-                    .frame(width: 7, height: 7)
-            }
-            .frame(width: 14)
-
-            IconTile(brand: sub.brandID,
-                     symbol: sub.symbolName,
-                     hex: sub.tintHex,
-                     name: sub.name,
-                     customID: sub.customIconID,
-                     size: 34)
-                .padding(.trailing, 10)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(sub.name)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Text(sub.cycle.shortLabel)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-
-            Spacer(minLength: 8)
-
-            Text(sub.price.formatted())
-                .font(.wsNumber(14, weight: .medium))
-                .foregroundStyle(.primary)
+    private func stat(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.system(size: 10))
+                .foregroundStyle(tertiaryText)
+            Text(value)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.white.opacity(0.9))
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.7)
         }
-        .padding(.horizontal, 14)
-        .frame(height: rowHeight)
-        .contentShape(Rectangle())
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var dayText: String {
-        let components = Calendar.ws.dateComponents([.month, .day], from: renewal.date)
-        return "\(components.month ?? 0)/\(components.day ?? 0)"
+    /// 当前计费周期走过的比例：上次扣款 → 下次扣款。试用期用建账日 → 试用结束日。
+    private var progress: (start: Date, end: Date, fraction: Double)? {
+        guard isActive, !subscription.cycle.isOneTime else { return nil }
+
+        let calendar = Calendar.ws
+        let end: Date?
+        let start: Date?
+        if subscription.isTrial, let trialEnd = subscription.trialEndDate {
+            end = calendar.startOfDay(for: trialEnd)
+            start = calendar.startOfDay(for: subscription.createdAt)
+        } else {
+            end = subscription.nextBillingDate()
+            start = subscription.lastBillingDate()
+        }
+        guard let end, let start else { return nil }
+
+        let span = end.timeIntervalSince(start)
+        guard span > 0 else { return nil }
+        let elapsed = Date().timeIntervalSince(start)
+        return (start, end, min(1, max(0, elapsed / span)))
     }
 
-    private var weekText: String {
-        renewal.date.formatted(.dateTime.weekday(.abbreviated).locale(WSDate.locale))
+    private var meta: String {
+        let cycle = subscription.cycle.displayName
+        return subscription.vendor.isEmpty ? cycle : "\(subscription.vendor) · \(cycle)"
+    }
+
+    private var countdown: String {
+        guard isActive else { return subscription.state.displayName }
+        if subscription.isTrial, let days = subscription.trialDaysRemaining {
+            return days <= 0 ? "试用今天结束" : "试用还剩 \(days) 天"
+        }
+        guard let days = subscription.daysUntilNextBilling() else { return "无后续" }
+        if days <= 0 { return "今天扣款" }
+        if days == 1 { return "明天扣款" }
+        if days <= 60 { return "\(days) 天后" }
+        return subscription.nextBillingDate().map { WSDate.monthDay($0) } ?? "—"
+    }
+
+    private var countdownTint: Color {
+        guard isActive else { return .white.opacity(0.5) }
+        if subscription.isTrial { return Color(hex: "#C9A6FF") }
+        guard let days = subscription.daysUntilNextBilling() else { return .white.opacity(0.5) }
+        if days <= 3 { return Color(hex: "#FF9B7A") }
+        return .white.opacity(0.55)
     }
 }
 

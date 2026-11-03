@@ -55,9 +55,16 @@ public struct OnboardingView: View {
 
     private func presentPicker() {
         localError = nil
-        FolderPickerPresenter.present { url in
-            accept(url)
-        } onCancel: {}
+        FolderPickerPresenter.present { outcome in
+            switch outcome {
+            case .picked(let url):
+                accept(url)
+            case .empty:
+                localError = "系统没能读取这个文件夹，换一个试试（iCloud 云盘可以先在「文件」里打开一次）"
+            case .cancelled:
+                break
+            }
+        }
     }
 
     /// 选完立刻验证一次：目录 + 可写。iCloud 里只读的共享文件夹到这里就会被挡住，

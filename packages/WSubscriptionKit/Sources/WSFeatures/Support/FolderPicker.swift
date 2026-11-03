@@ -5,41 +5,48 @@ import UniformTypeIdentifiers
 
 /// 系统文件夹选择器。
 ///
-/// 两个必须踩准的点：
+/// 三个必须踩准的点，缺一个「打开」按钮就会点了没反应：
 ///
-/// 1. **不能用 SwiftUI 的 `.fileImporter`**：它默认按「导入」语义工作（把选中的项目复制进
-///    App 的 Inbox）。文件夹没有「复制一份」这种语义，于是 iCloud 云盘里真实存在的目录会被
-///    系统画成不可选。这里显式 `asCopy: false` 走「就地打开」，配合 Info.plist 里的
-///    `LSSupportsOpeningDocumentsInPlace = YES`，iCloud 目录才能被选中。
-/// 2. **不要塞进 SwiftUI 的 `.sheet`**：那样得到的是一个被包了一层的页面，顶部没有
-///    「打开」按钮，用户只能一路往里钻，选不了当前这一层。直接从窗口最上层的控制器弹出，
-///    才是系统原生的全屏选择器。
+/// 1. Info.plist 里要同时有 `LSSupportsOpeningDocumentsInPlace` **和** `UIFileSharingEnabled`。
+///    只有前者时选择器仍可能按「导入」语义工作 —— 而文件夹无法被复制进沙盒，系统就只回一个
+///    空数组，甚至不回调。这两项光靠 `INFOPLIST_KEY_*` 构建设置写不进 plist，所以用了真实
+///    的 `Config/Info.plist`。
+/// 2. 必须 `asCopy: false`，否则同样是「复制」语义。
+/// 3. 要给一个具体的 `directoryURL`。从默认的「最近项目」根进去时，部分 iOS 版本不会启用
+///    「打开」按钮；落在真实目录上才稳定。
 @MainActor
 enum FolderPickerPresenter {
+    enum Outcome {
+        case picked(URL)
+        case cancelled
+        /// 选择器回调了，但没带回任何 URL。系统「准备项目」失败时就是这样。
+        /// 不能当取消处理，否则用户点「打开」只会看到界面关掉、什么都没发生。
+        case empty
+    }
+
     private static var picker: UIDocumentPickerViewController?
     private static var coordinator: Coordinator?
 
-    static func present(onPick: @escaping (URL) -> Void,
-                        onCancel: @escaping () -> Void) {
+    static func present(_ onOutcome: @escaping (Outcome) -> Void) {
         guard let host = topViewController() else {
-            onCancel()
+            onOutcome(.cancelled)
             return
         }
 
         let controller = UIDocumentPickerViewController(forOpeningContentTypes: [.folder],
                                                         asCopy: false)
         controller.allowsMultipleSelection = false
+        controller.shouldShowFileExtensions = false
+        controller.directoryURL = FileManager.default.urls(for: .documentDirectory,
+                                                           in: .userDomainMask).first
 
-        let coordinator = Coordinator { url in
+        let coordinator = Coordinator { outcome in
             finish()
-            onPick(url)
-        } onCancel: {
-            finish()
-            onCancel()
+            onOutcome(outcome)
         }
         controller.delegate = coordinator
 
-        // 选择器和它的 delegate 都要有人持有，否则弹出后立刻被释放。
+        // 选择器和 delegate 都要有人持有：delegate 是 weak，弹出后没人持有就收不到回调。
         picker = controller
         self.coordinator = coordinator
         host.present(controller, animated: true)
@@ -52,10 +59,8 @@ enum FolderPickerPresenter {
     }
 
     private static func topViewController() -> UIViewController? {
-        let scene = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .first { $0.activationState == .foregroundActive }
-            ?? UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
 
         var controller = scene?.keyWindow?.rootViewController
             ?? scene?.windows.first?.rootViewController
@@ -66,25 +71,23 @@ enum FolderPickerPresenter {
     }
 
     private final class Coordinator: NSObject, UIDocumentPickerDelegate {
-        private let onPick: (URL) -> Void
-        private let onCancel: () -> Void
+        private let onOutcome: (Outcome) -> Void
 
-        init(onPick: @escaping (URL) -> Void, onCancel: @escaping () -> Void) {
-            self.onPick = onPick
-            self.onCancel = onCancel
+        init(onOutcome: @escaping (Outcome) -> Void) {
+            self.onOutcome = onOutcome
         }
 
         func documentPicker(_ controller: UIDocumentPickerViewController,
                             didPickDocumentsAt urls: [URL]) {
             guard let url = urls.first else {
-                onCancel()
+                onOutcome(.empty)
                 return
             }
-            onPick(url)
+            onOutcome(.picked(url))
         }
 
         func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-            onCancel()
+            onOutcome(.cancelled)
         }
     }
 }

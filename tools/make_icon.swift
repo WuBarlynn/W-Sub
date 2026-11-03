@@ -1,39 +1,98 @@
-import Foundation
+import AppKit
 import CoreGraphics
 import ImageIO
 import UniformTypeIdentifiers
 
-let size = 1024
-let canvas = CGFloat(size)
-let space = CGColorSpaceCreateDeviceRGB()
-let white = CGColor(colorSpace: space, components: [1, 1, 1, 1])!
+/// 生成 App 图标：纯色底 + 一叠订阅卡片。
+/// 一叠卡片 = 好几项订阅摞在一起，对应 App 首页那套翻页卡片；
+/// 最前面一张上放一个顺时针的循环箭头，说明这些是「会周期性扣钱的」。
+/// 用法：swift make_icon.swift <输出路径> [stack|renew]
 
-let ctx = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8,
+let args = CommandLine.arguments
+let outputPath = args.count > 1 ? args[1] : "icon-1024.png"
+let variant = args.count > 2 ? args[2] : "renew"
+
+let side = 1024
+let canvas = CGFloat(side)
+let space = CGColorSpaceCreateDeviceRGB()
+
+let ctx = CGContext(data: nil, width: side, height: side, bitsPerComponent: 8,
                     bytesPerRow: 0, space: space,
                     bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
 
-// 纯色底：无渐变、无描边
-ctx.setFillColor(CGColor(colorSpace: space, components: [CGFloat(44) / 255, CGFloat(70) / 255, CGFloat(199) / 255, 1])!)
+func color(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> CGColor {
+    CGColor(colorSpace: space, components: [r, g, b, a])!
+}
+
+let brand = color(CGFloat(44) / 255, CGFloat(70) / 255, CGFloat(199) / 255)
+
+// 底色：单色，无渐变
+ctx.setFillColor(brand)
 ctx.fill(CGRect(x: 0, y: 0, width: canvas, height: canvas))
 
-// 几何 W：四段折线，圆角接头，纯白实心
-let w = CGMutablePath()
-w.move(to: CGPoint(x: 214, y: 668))
-w.addLine(to: CGPoint(x: 352, y: 356))
-w.addLine(to: CGPoint(x: 512, y: 612))
-w.addLine(to: CGPoint(x: 672, y: 356))
-w.addLine(to: CGPoint(x: 810, y: 668))
+let cardWidth: CGFloat = 720
+let cardHeight: CGFloat = 440
+let cardRadius: CGFloat = 68
 
-ctx.setStrokeColor(white)
-ctx.setLineWidth(112)
-ctx.setLineCap(.round)
-ctx.setLineJoin(.round)
-ctx.addPath(w)
-ctx.strokePath()
+/// 一张居中、可缩放的圆角卡片。CoreGraphics 的 y 向上为正，所以 centerY 越大越靠上。
+func drawCard(centerY: CGFloat, scale: CGFloat, alpha: CGFloat) {
+    let width = cardWidth * scale
+    let height = cardHeight * scale
+    let rect = CGRect(x: (canvas - width) / 2, y: centerY - height / 2, width: width, height: height)
+    ctx.setFillColor(color(1, 1, 1, alpha))
+    ctx.addPath(CGPath(roundedRect: rect, cornerWidth: cardRadius * scale,
+                       cornerHeight: cardRadius * scale, transform: nil))
+    ctx.fillPath()
+}
 
-let image = ctx.makeImage()!
-let url = URL(fileURLWithPath: CommandLine.arguments[1])
-let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!
+// 后面的卡往上露头，最前面一张压在最下面 —— 像一叠卡片从正面看过去
+drawCard(centerY: 622, scale: 0.86, alpha: 0.34)
+drawCard(centerY: 526, scale: 0.93, alpha: 0.60)
+drawCard(centerY: 430, scale: 1.00, alpha: 1.00)
+
+if variant == "renew" {
+    let center = CGPoint(x: canvas / 2, y: 430)
+    let radius: CGFloat = 138
+    let lineWidth: CGFloat = 48
+    let halfWidth = lineWidth / 2
+
+    // 圆环：从 118° 逆时针画到 30°，右上留缺口
+    let startAngle = 118.0 * CGFloat.pi / 180
+    let baseAngle = 30.0 * CGFloat.pi / 180
+
+    ctx.setStrokeColor(brand)
+    ctx.setLineWidth(lineWidth)
+    ctx.setLineCap(.butt)
+    ctx.addArc(center: center, radius: radius,
+               startAngle: startAngle, endAngle: baseAngle, clockwise: false)
+    ctx.strokePath()
+
+    // 箭头底边沿半径方向，正好接住圆环的切口，不会出现台阶
+    let tipAngle = baseAngle + 34.0 * CGFloat.pi / 180
+    let headHalf: CGFloat = 36
+    let outer = CGPoint(x: center.x + cos(baseAngle) * (radius + headHalf),
+                        y: center.y + sin(baseAngle) * (radius + headHalf))
+    let inner = CGPoint(x: center.x + cos(baseAngle) * (radius - headHalf),
+                        y: center.y + sin(baseAngle) * (radius - headHalf))
+    let tip = CGPoint(x: center.x + cos(tipAngle) * radius,
+                      y: center.y + sin(tipAngle) * radius)
+
+    let head = CGMutablePath()
+    head.move(to: outer)
+    head.addLine(to: tip)
+    head.addLine(to: inner)
+    head.closeSubpath()
+    ctx.setFillColor(brand)
+    ctx.addPath(head)
+    ctx.fillPath()
+}
+
+guard let image = ctx.makeImage() else { exit(1) }
+let url = URL(fileURLWithPath: outputPath)
+guard let destination = CGImageDestinationCreateWithURL(url as CFURL,
+                                                       UTType.png.identifier as CFString, 1, nil) else {
+    exit(1)
+}
 CGImageDestinationAddImage(destination, image, nil)
 CGImageDestinationFinalize(destination)
 print("written: \(url.path)")
