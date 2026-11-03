@@ -89,7 +89,7 @@ public struct HomeView: View {
         guard let yearEnd = calendar.dateInterval(of: .year, for: Date())?.end else { return 0 }
         let interval = DateInterval(start: calendar.startOfDay(for: Date()), end: yearEnd)
         return snapshot.activeSubscriptions.reduce(0) { total, sub in
-            total + sub.cycle.dates(in: interval, anchor: sub.anchorDate, calendar: calendar).count
+            total + sub.billableDates(in: interval, calendar: calendar).count
         }
     }
 
@@ -180,31 +180,28 @@ private struct SubscriptionDeck: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @State private var position: CGFloat = 0
-    @State private var cardHeight: CGFloat = 420
+    @State private var dragStart: CGFloat?
+    /// 后面的卡向下错开的距离：堆叠在底部露边
+    private let stackGap: CGFloat = 11
 
     var body: some View {
         GeometryReader { proxy in
-            let height = max(300, proxy.size.height - 38)
+            let height = max(300, proxy.size.height - stackGap * 2.4)
             ZStack(alignment: .top) {
                 ForEach(visible, id: \.item.id) { entry in
                     card(entry, height: height)
                 }
             }
-            .padding(.top, 30)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .clipped()
             .contentShape(Rectangle())
             .gesture(dragGesture)
             .onAppear { cardHeight = height }
             .onChange(of: height) { _, newValue in cardHeight = newValue }
-            .onChange(of: position) { _, newValue in
-                let rounded = min(max(0, Int(newValue.rounded())), max(0, items.count - 1))
-                if rounded != index { index = rounded }
-            }
         }
     }
 
-    /// 窗口按 index 算，拖动过程中不增删卡片
+    /// 窗口以已提交的 index 为基准：拖动与翻页动画过程中不增删视图。
     private var visible: [(item: Subscription, index: Int)] {
         guard !items.isEmpty else { return [] }
         let lower = max(0, index - 1)
@@ -215,44 +212,38 @@ private struct SubscriptionDeck: View {
 
     private func card(_ entry: (item: Subscription, index: Int), height: CGFloat) -> some View {
         let i = entry.index
+        // d 只由 position 决定：0 = 就位，正数 = 堆叠在下面，负数 = 已翻走
         let d = CGFloat(i) - position
         return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
             .equatable()
             .frame(height: height)
             .overlay {
-                // 越靠后的卡压一层黑，层次连续，卡片本体不用重算
+                // 越靠后的卡压一层黑，层次连续；卡片本体不参与每帧重算
                 RoundedRectangle(cornerRadius: 26, style: .continuous)
                     .fill(.black.opacity(0.26 * Double(min(2, max(0, d)))))
             }
-            .scaleEffect(scale(for: i, d: d), anchor: .top)
-            .offset(y: offset(for: i, height: height))
-            .zIndex(zIndex(for: i))
+            .scaleEffect(scale(d), anchor: .top)
+            .offset(y: offset(d, height: height))
+            // 层级在整次拖动中固定，避免动画期间重排
+            .zIndex(Double(100 - abs(i - index) * 2))
             .allowsHitTesting(i == index)
-            .onTapGesture { onSelect(entry.item) }
+            .onTapGesture { if i == index { onSelect(entry.item) } }
     }
 
-    private func scale(for i: Int, d: CGFloat) -> CGFloat {
-        guard i > index else { return 1 }
-        return 1 - 0.03 * min(2, max(0, d))
+    // MARK: 变换：d 的单一连续函数（没有 index 分支，这是消除跳动的关键）
+
+    /// 堆叠中的卡略小；正在翻走的卡保持原尺寸飞出。
+    private func scale(_ d: CGFloat) -> CGFloat {
+        d >= 0 ? 1 - 0.04 * min(2, d) : 1
     }
 
-    /// 当前卡：位移完全等于手指位移（(index − position) × 卡片高度），所以是 1:1 跟手。
-    /// 上一张：从上方按同样的比例滑下来。后面的卡：原地缩着，只挪 9pt 露出边。
-    private func offset(for i: Int, height: CGFloat) -> CGFloat {
-        if i == index {
-            return (CGFloat(index) - position) * height
-        }
-        if i > index {
-            return -9 * (CGFloat(i) - position)
-        }
-        return -(position - CGFloat(i)) * height
+    /// d >= 0：堆叠的卡向下错开 stackGap，底部露边；
+    /// d < 0：翻走的卡按 1:1 跟手向上飞出（d 每减 1，位移正好一整张卡高）。
+    private func offset(_ d: CGFloat, height: CGFloat) -> CGFloat {
+        d >= 0 ? stackGap * d : d * height
     }
 
-    private func zIndex(for i: Int) -> Double {
-        if i == index { return 10 }
-        if i < index { return 9 }
-        return Double(10 - (i - index))
-    }
+    // MARK: 手势
 
     private var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
@@ -265,7 +256,7 @@ private struct SubscriptionDeck: View {
                 let start = dragStart ?? position
                 dragStart = nil
 
-                // 位移过卡片高度的 18%，或者快速一甩（预测过 45%）才翻页
+                // 位移过卡片高度的 18%，或快速一甩（预测过 45%）才翻页
                 let translation = -value.translation.height / max(1, cardHeight)
                 let predicted = -value.predictedEndTranslation.height / max(1, cardHeight)
                 let base = start.rounded()
@@ -281,13 +272,16 @@ private struct SubscriptionDeck: View {
                 withAnimation(.spring(response: 0.36, dampingFraction: 0.9)) {
                     position = target
                 } completion: {
+                    // index 只在动画彻底落位后提交：
+                    // 窗口、层级、页码计数都不在拖动中途变化
                     let settled = Int(position.rounded())
                     if settled != index { index = settled }
                 }
             }
     }
 
-    @State private var dragStart: CGFloat?
+    /// 手指位移换算成 position 的基准高度（拖动开始时记一次）
+    @State private var cardHeight: CGFloat = 420
 
     private func rubberBand(_ value: CGFloat) -> CGFloat {
         let maxIndex = CGFloat(max(0, items.count - 1))
@@ -607,37 +601,49 @@ private struct SubscriptionDeckCard: View, Equatable {
 
             HStack(alignment: .top, spacing: 10) {
                 stat("周期", subscription.cycle.displayName)
-                stat("上次扣款", subscription.lastBillingDate().map { WSDate.monthDay($0) } ?? "—")
+                stat("上次扣款", subscription.isTrial ? "—" : (subscription.lastBillingDate().map { WSDate.monthDay($0) } ?? "—"))
                 stat("已订", subscribedText)
             }
 
             Spacer(minLength: 12)
 
+            // 底部淡紫色横条：分类 + 提醒 + 续费方式，一眼扫到结尾
             HStack(spacing: 8) {
-                footerChip(categoryName)
-                footerChip(reminderText)
+                Image(systemName: subscription.autoRenew && isActive
+                      ? "arrow.triangle.2.circlepath"
+                      : "pause.circle")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.62))
+                Text(isActive ? categoryName : subscription.state.displayName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.78))
+                    .lineLimit(1)
+                Text("·")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(reminderText)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.55))
+                    .lineLimit(1)
                 Spacer(minLength: 0)
-                if subscription.autoRenew, isActive {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.35))
-                }
+                Text(subscription.cycle.shortLabel)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.72))
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 34)
+            .frame(maxWidth: .infinity)
+            .background(Color(hex: "#8E7CC3").opacity(0.24),
+                        in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(Color(hex: "#A996E3").opacity(0.30), lineWidth: 0.5)
             }
         }
         .padding(.horizontal, 18)
         .padding(.top, 4)
-        .padding(.bottom, 18)
+        .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    private func footerChip(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 10))
-            .foregroundStyle(.white.opacity(0.5))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(.white.opacity(0.07),
-                        in: Capsule(style: .continuous))
     }
 
     private func stat(_ title: String, _ value: String) -> some View {
@@ -694,7 +700,7 @@ private struct SubscriptionDeckCard: View, Equatable {
     }
 
     private var categoryName: String {
-        TemplateCatalog.all.first { $0.id == subscription.categoryID }?.name ?? "未分类"
+        Category.builtIns.first { $0.id == subscription.categoryID }?.name ?? "其他"
     }
 
     private var reminderText: String {

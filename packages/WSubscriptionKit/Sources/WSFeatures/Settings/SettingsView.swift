@@ -1,6 +1,7 @@
 #if os(iOS)
 import SwiftUI
 import UserNotifications
+import UniformTypeIdentifiers
 import WSDesignSystem
 import WSCore
 
@@ -11,11 +12,18 @@ public struct SettingsView: View {
     @State private var showRecovery = false
     @State private var recoveryCode: String?
     @State private var confirmDisableBiometry = false
-    @State private var exportURL: URL?
+    @State private var backupURL: URL?
+    @State private var csvURL: URL?
     @State private var notificationsOn = false
     @State private var iconCount = IconStore.shared.count()
     @State private var confirmCleanIcons = false
+    @State private var confirmImportBackup = false
+    @State private var showImportBackup = false
     @State private var rateDrafts: [String: String] = [:]
+
+    private static let vaultType: [UTType] = {
+        [UTType(filenameExtension: "vault") ?? .data]
+    }()
 
     public init() {}
 
@@ -84,12 +92,20 @@ public struct SettingsView: View {
                 }
 
                 Section("数据") {
-                    LabeledContent {
-                        Text(model.folderName.isEmpty ? "—" : model.folderName)
-                            .foregroundStyle(.secondary)
+                    Button {
+                        Task {
+                            backupURL = nil
+                            backupURL = await model.exportEncryptedBackup()
+                        }
                     } label: {
-                        row("文件夹", "folder.fill")
+                        row("导出加密备份", "lock.doc")
                     }
+                    .buttonStyle(.plain)
+
+                    Button { confirmImportBackup = true } label: {
+                        row("导入备份", "square.and.arrow.down")
+                    }
+                    .buttonStyle(.plain)
 
                     Button { Task { await model.flush() } } label: {
                         row("立即保存", "checkmark.circle.fill")
@@ -106,8 +122,8 @@ public struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button { exportURL = makeCSV() } label: {
-                        row("导出 CSV", "square.and.arrow.up")
+                    Button { csvURL = makeCSV() } label: {
+                        row("导出 CSV（明文）", "square.and.arrow.up")
                     }
                     .buttonStyle(.plain)
 
@@ -191,9 +207,24 @@ public struct SettingsView: View {
             .navigationTitle("设置")
             .sheet(isPresented: $showChangePassphrase) { ChangePassphraseView() }
             .sheet(isPresented: $showRecovery) { RecoveryCodeSheet(code: recoveryCode ?? "") }
-            .sheet(isPresented: Binding(get: { exportURL != nil },
-                                        set: { if !$0 { exportURL = nil } })) {
-                if let exportURL { ExportSheet(url: exportURL) }
+            .sheet(isPresented: Binding(get: { backupURL != nil },
+                                        set: { if !$0 { backupURL = nil } })) {
+                if let backupURL { BackupExportSheet(url: backupURL) }
+            }
+            .sheet(isPresented: Binding(get: { csvURL != nil },
+                                        set: { if !$0 { csvURL = nil } })) {
+                if let csvURL { CSVExportSheet(url: csvURL) }
+            }
+            .fileImporter(isPresented: $showImportBackup,
+                          allowedContentTypes: Self.vaultType,
+                          allowsMultipleSelection: false) { result in
+                switch result {
+                case .success(let urls):
+                    guard let url = urls.first else { return }
+                    Task { await model.importVault(from: url) }
+                case .failure:
+                    break
+                }
             }
             .onAppear {
                 iconCount = IconStore.shared.count()
@@ -212,6 +243,12 @@ public struct SettingsView: View {
                     iconCount = 0
                 }
                 Button("取消", role: .cancel) {}
+            }
+            .confirmationDialog("导入备份会替换当前所有数据", isPresented: $confirmImportBackup, titleVisibility: .visible) {
+                Button("选择备份文件", role: .destructive) { showImportBackup = true }
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("导入后需要用那份备份的密码解锁。")
             }
         }
     }
@@ -339,7 +376,44 @@ struct RecoveryCodeSheet: View {
     }
 }
 
-struct ExportSheet: View {
+/// 加密备份导出：文件本身就是加密的，密码不变
+struct BackupExportSheet: View {
+    let url: URL
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 14) {
+                Text("加密备份已就绪")
+                    .font(.system(size: 17, weight: .semibold))
+                Text("文件保持加密，用当前密码解锁。可存到「文件」或 iCloud。")
+                    .font(.wsMeta)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
+                ShareLink(item: url) {
+                    Label("分享 / 存储到「文件」", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(.horizontal, 24)
+
+                Button("取消") { dismiss() }
+                    .font(.system(size: 14))
+            }
+            .padding(.top, 28)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("完成") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+struct CSVExportSheet: View {
     let url: URL
     @Environment(\.dismiss) private var dismiss
 

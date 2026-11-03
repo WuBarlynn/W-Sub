@@ -146,6 +146,62 @@ final class VaultAggregationTests: XCTestCase {
         XCTAssertEqual(slices.first?.category.id, "streaming")
     }
 
+    // MARK: 试用期扣费为 0
+
+    func testTrialPeriodChargesNothing() {
+        let calendar = Calendar.ws
+        let now = Date()
+        var snapshot = VaultSnapshot()
+        snapshot.settings.primaryCurrency = "CNY"
+        // 试用 7 天，试用结束后按月扣 30 元
+        snapshot.subscriptions = [
+            Subscription(name: "Trial", categoryID: "streaming",
+                         price: Money(minorUnits: 3000, currencyCode: "CNY"),
+                         cycle: .monthly, anchorDate: now, state: .active,
+                         isTrial: true,
+                         trialEndDate: calendar.date(byAdding: .day, value: 7, to: now),
+                         deviceID: UUID())
+        ]
+
+        // 本月（试用期内）：一分钱都不该出现
+        let thisMonth = snapshot.monthlySpend(monthsBack: 1, now: now)
+        XCTAssertEqual(thisMonth.last?.amount.minorUnits, 0)
+
+        // 今年剩余：试用 7 天内也不会开始扣款（下一个扣款日在试用结束之后）
+        let remaining = snapshot.remainingThisYear(now: now)
+        // 试用结束后今年还有一次月扣
+        let yearEnd = calendar.dateInterval(of: .year, for: now)!.end
+        let interval = DateInterval(start: calendar.startOfDay(for: now), end: yearEnd)
+        let hits = snapshot.subscriptions[0].billableDates(in: interval).count
+        XCTAssertEqual(hits, 1)
+        XCTAssertEqual(remaining.minorUnits, 3000)
+
+        // 试用结束之后回到正常计费（扣款日锚定试用开始日，每月 3 号，
+        // 所以取试用结束后的下个月，那时一定有一笔扣款）
+        let afterTrial = calendar.date(byAdding: .day, value: 35, to: now)!
+        let nextMonth = snapshot.monthlySpend(monthsBack: 1, now: afterTrial)
+        XCTAssertGreaterThan(nextMonth.last?.amount.minorUnits ?? 0, 0)
+    }
+
+    func testNonTrialBillableDatesUnchanged() {
+        let calendar = Calendar.ws
+        func on(_ y: Int, _ m: Int, _ d: Int) -> Date {
+            calendar.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
+        }
+        var snapshot = VaultSnapshot()
+        snapshot.settings.primaryCurrency = "CNY"
+        snapshot.subscriptions = [
+            Subscription(name: "Normal", categoryID: "streaming",
+                         price: Money(minorUnits: 1500, currencyCode: "CNY"),
+                         cycle: .monthly, anchorDate: on(2026, 1, 10),
+                         state: .active, deviceID: UUID())
+        ]
+        let interval = DateInterval(start: calendar.startOfDay(for: on(2026, 1, 1)),
+                                    end: calendar.startOfDay(for: on(2026, 4, 1)))
+        let hits = snapshot.subscriptions[0].billableDates(in: interval).count
+        XCTAssertEqual(hits, 3)
+    }
+
     func testCrossCurrencyUsesManualRate() {
         var snapshot = makeSnapshot()
         snapshot.settings.manualRates["USD"] = 7

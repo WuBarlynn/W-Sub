@@ -98,46 +98,60 @@ public final class AppModel: ObservableObject {
         }
         #endif
 
-        guard let record = bookmarks.load() else {
-            phase = .onboarding
-            return
+        // 主存储固定在 App 内部 Documents（UIFileSharingEnabled 已开，
+        // 「文件 > 我的 iPhone > W Sub」里可见，用户可手动搬走，也可以从设置导出）。
+        let directory = Self.vaultDirectory
+        let access = FolderAccess(url: directory)
+        let store = VaultStore(store: VaultFileStore(access: access))
+        self.store = store
+
+        // 旧版本曾把库放在用户自选的外部文件夹；这里把它搬回 App 内部，之后不再依赖书签。
+        if await store.hasFile == false, await migrateLegacyVault(into: directory) {
+            self.store = VaultStore(store: VaultFileStore(access: FolderAccess(url: directory)))
         }
-        folderName = record.displayPath
+
+        if await self.store?.hasFile == true {
+            biometryRegistered = (await self.store?.headerSummary())?.hasBiometric ?? false
+            subscribe(to: self.store!)
+            phase = .locked
+        } else {
+            phase = .onboarding
+        }
+        folderName = "App 内部"
+    }
+
+    /// App 自己的 Documents 目录：唯一主存储位置。
+    public static let vaultDirectory: URL = FileManager.default
+        .urls(for: .documentDirectory, in: .userDomainMask)[0]
+
+    /// 把旧的外部库文件（security-scoped bookmark 时代）迁移进 App 内部。
+    private func migrateLegacyVault(into directory: URL) async -> Bool {
+        guard let record = bookmarks.load() else { return false }
+        defer { bookmarks.clear() }
         do {
             let access = try FolderAccess.from(bookmark: record.bookmark)
-            guard access.probe() else {
-                notice = "上次使用的文件夹已不可访问，请重新选择"
-                phase = .onboarding
-                return
-            }
-            let store = VaultStore(store: VaultFileStore(access: access, fileName: record.fileName))
-            self.store = store
-            guard await store.hasFile else {
-                notice = "这个文件夹里还没有数据文件"
-                phase = .onboarding
-                return
-            }
-            biometryRegistered = (await store.headerSummary())?.hasBiometric ?? false
-            subscribe(to: store)
-            phase = .locked
+            let legacy = VaultFileStore(access: access, fileName: record.fileName)
+            guard legacy.exists() else { return false }
+            let data = try legacy.read()
+            try data.write(to: directory.appendingPathComponent("WSubscription.vault"),
+                           options: .atomic)
+            return true
         } catch {
-            notice = AppModel.describe(error)
-            phase = .onboarding
+            // 迁移失败不打断启动，只是回到引导页让用户导入备份
+            return false
         }
     }
 
     // MARK: - 建库
 
     @discardableResult
-    public func createVault(directory: URL,
-                            passphrase: String,
+    public func createVault(passphrase: String,
                             enableBiometry: Bool) async throws -> String {
         isBusy = true
         defer { isBusy = false }
         flowError = nil
 
-        let bookmark = try FolderAccess.bookmark(for: directory)
-        let access = FolderAccess(url: directory, mode: .securityScoped)
+        let access = FolderAccess(url: Self.vaultDirectory)
         let store = VaultStore(store: VaultFileStore(access: access))
         self.store = store
 
@@ -149,10 +163,7 @@ public final class AppModel: ObservableObject {
         let result = try await store.createVault(initial: VaultSnapshot(),
                                                  passphrase: passphrase,
                                                  biometricPublicKey: publicKey)
-        bookmarks.save(VaultBookmarkStore.Record(bookmark: bookmark,
-                                                 fileName: "WSubscription.vault",
-                                                 displayPath: directory.lastPathComponent))
-        folderName = directory.lastPathComponent
+        folderName = "App 内部"
         biometryRegistered = publicKey != nil
         snapshot = result.snapshot
         subscribe(to: store)
@@ -323,6 +334,52 @@ public final class AppModel: ObservableObject {
 
     public func flush() async {
         do { try await store?.flush() } catch { notice = AppModel.describe(error) }
+    }
+
+    // MARK: - 加密备份
+
+    /// 把当前库原样导出成一份加密文件（就是 .vault 本体，密码不变）。
+    /// 返回临时文件 URL，交给系统分享面板，用户存到「文件」/iCloud/AirDrop 都行。
+    public func exportEncryptedBackup() async -> URL? {
+        guard let store else { return nil }
+        do {
+            try await store.flush()
+            let source = Self.vaultDirectory.appendingPathComponent("WSubscription.vault")
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyyMMdd-HHmm"
+            let name = "WSub-备份-\(formatter.string(from: Date())).vault"
+            let destination = FileManager.default.temporaryDirectory
+                .appendingPathComponent(name, isDirectory: false)
+            try? FileManager.default.removeItem(at: destination)
+            try FileManager.default.copyItem(at: source, to: destination)
+            return destination
+        } catch {
+            notice = AppModel.describe(VaultStore.map(error))
+            return nil
+        }
+    }
+
+    /// 用之前导出的加密备份替换当前库。成功后回到锁定页，用原库的密码解锁。
+    public func importVault(from url: URL) async {
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let data = try Data(contentsOf: url)
+            // 先校验文件结构，避免把随便选的文件当成库写进去
+            _ = try VaultFileCodec.header(of: data)
+            let destination = Self.vaultDirectory.appendingPathComponent("WSubscription.vault")
+            try data.write(to: destination, options: .atomic)
+            // 重置运行态，重新走启动流程（phase 会落到 .locked）
+            eventTask?.cancel()
+            eventTask = nil
+            await store?.lock(flushFirst: false)
+            store = nil
+            snapshot = nil
+            detectedRollback = false
+            await bootstrap()
+        } catch {
+            flowError = "这不是有效的 W Sub 备份文件"
+        }
     }
 
     // MARK: - 安全设置

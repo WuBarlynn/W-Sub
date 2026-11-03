@@ -9,7 +9,6 @@ public struct OnboardingView: View {
     @EnvironmentObject private var model: AppModel
 
     @State private var step = 0
-    @State private var directory: URL?
     @State private var passphrase = ""
     @State private var confirm = ""
     @State private var useBiometry = true
@@ -17,7 +16,12 @@ public struct OnboardingView: View {
     @State private var acknowledged = false
     @State private var isWorking = false
     @State private var localError: String?
-    @State private var showLocationOptions = false
+    @State private var showImport = false
+
+    /// .vault 文件类型：动态 UTType，按扩展名匹配
+    private static let vaultType: [UTType] = {
+        [UTType(filenameExtension: "vault") ?? .data]
+    }()
 
     public init() {}
 
@@ -28,7 +32,7 @@ public struct OnboardingView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         switch step {
                         case 0: welcome
-                        case 1: folderStep
+                        case 1: storageStep
                         case 2: passphraseStep
                         default: recoveryStep
                         }
@@ -42,66 +46,16 @@ public struct OnboardingView: View {
                 footer
             }
         }
-        .confirmationDialog("数据保存在哪里", isPresented: $showLocationOptions, titleVisibility: .visible) {
-            Button("用 App 自己的文件夹") { useAppFolder() }
-            Button("存到「文件」…") { saveToFiles() }
-            Button("直接选文件夹") { presentPicker() }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("App 文件夹最稳，在「文件 > 我的 iPhone > W Sub」里可见；存到「文件」可以选 iCloud 云盘。")
-        }
-        .task {
-            #if DEBUG
-            // 调试用：-ws-picker 直接打开文件夹选择器，方便在没有 UI 自动化时验证授权流程
-            if ProcessInfo.processInfo.arguments.contains("-ws-picker") {
-                step = 1
-                try? await Task.sleep(for: .seconds(1))
-                presentPicker()
+        .fileImporter(isPresented: $showImport,
+                      allowedContentTypes: Self.vaultType,
+                      allowsMultipleSelection: false) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                Task { await model.importVault(from: url) }
+            case .failure(let error):
+                localError = error.localizedDescription
             }
-            #endif
-        }
-    }
-
-    private func presentPicker() {
-        FolderPickerPresenter.present { handle($0) }
-    }
-
-    /// 走「存储到文件」面板：系统保证目标可写，落盘 URL 的父目录就是用户选的目录。
-    private func saveToFiles() {
-        FolderPickerPresenter.saveToFiles(fileName: "WSubscription.vault") { handle($0, verify: false) }
-    }
-
-    /// 零授权：直接落在 App 自己的 Documents 里，文件 App 里能看到（Info.plist 开了文件共享）。
-    private func useAppFolder() {
-        let folder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        accept(folder)
-    }
-
-    private func handle(_ outcome: FolderPickerPresenter.Outcome, verify: Bool = true) {
-        switch outcome {
-        case .picked(let url):
-            accept(url, verify: verify)
-        case .empty:
-            localError = "系统没能读取这个位置，换一种方式试试"
-        case .cancelled:
-            break
-        }
-    }
-
-    /// 选完立刻验证一次：目录 + 可写。iCloud 里只读的共享文件夹到这里就会被挡住，
-    /// 不会等到「创建」按钮按下去才失败。
-    private func accept(_ url: URL, verify: Bool = true) {
-        localError = nil
-        do {
-            if verify {
-                let access = FolderAccess(url: url, mode: .securityScoped)
-                try access.verifyWritable()
-            }
-            directory = url
-            model.clearMessages()
-            withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
-        } catch {
-            localError = AppModel.describe(error)
         }
     }
 
@@ -119,26 +73,55 @@ public struct OnboardingView: View {
         .padding(.top, 60)
     }
 
-    private var folderStep: some View {
+    /// 数据保存说明。不再选文件夹：主存储固定在 App 内部，随时可导出加密备份。
+    private var storageStep: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("选择文件夹")
+            Text("数据保存")
                 .font(.system(size: 28, weight: .semibold))
 
             SurfaceCard {
                 HStack(spacing: 12) {
-                    Image(systemName: directory == nil ? "folder" : "folder.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(directory == nil ? Color.secondary : WSTheme.accent)
-                    Text(directory?.lastPathComponent ?? "未选择")
-                        .font(.system(size: 15, weight: .medium))
+                    Image(systemName: "lock.square.stack.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(WSTheme.accent)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("加密后保存在 App 内部")
+                            .font(.system(size: 15, weight: .medium))
+                        Text("可在设置中随时导出加密备份")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                 }
             }
 
-            Text("数据是一个加密文件，放进你选的文件夹。选不了位置时用「App 自己的文件夹」即可，之后在「文件」里能移动它。")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                showImport = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "square.and.arrow.down.on.square")
+                        .font(.system(size: 20))
+                        .foregroundStyle(WSTheme.accent)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("打开之前的库")
+                            .font(.system(size: 15, weight: .medium))
+                        Text("选择之前导出的 .vault 备份")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .buttonStyle(.plain)
+            .padding(14)
+            .background(Color.wsCard, in: RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous)
+                    .strokeBorder(Color.wsHairline, lineWidth: 0.5)
+            }
         }
         .padding(.top, 24)
     }
@@ -210,9 +193,7 @@ public struct OnboardingView: View {
             case 0:
                 primary("开始") { advance() }
             case 1:
-                primary(directory == nil ? "选择保存位置" : "下一步", enabled: true) {
-                    if directory == nil { showLocationOptions = true } else { advance() }
-                }
+                primary("下一步") { advance() }
             case 2:
                 primary(isWorking ? "创建中…" : "创建", enabled: canCreate) {
                     Task { await create() }
@@ -222,12 +203,6 @@ public struct OnboardingView: View {
                     model.clearMessages()
                     model.completeOnboarding()
                 }
-            }
-
-            if step == 1, directory != nil {
-                Button("重新选择") { presentPicker() }
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal, WSTheme.pagePadding)
@@ -261,16 +236,11 @@ public struct OnboardingView: View {
     }
 
     private func create() async {
-        guard let directory else {
-            localError = "请先选择文件夹"
-            return
-        }
         isWorking = true
         localError = nil
         defer { isWorking = false }
         do {
-            recoveryCode = try await model.createVault(directory: directory,
-                                                       passphrase: passphrase,
+            recoveryCode = try await model.createVault(passphrase: passphrase,
                                                        enableBiometry: useBiometry)
             withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
         } catch {

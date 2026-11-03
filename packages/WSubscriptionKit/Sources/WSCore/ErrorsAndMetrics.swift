@@ -111,7 +111,8 @@ public extension VaultSnapshot {
 
             var sum = Money.zero(code)
             for sub in subscriptions where sub.state == .active {
-                let hits = sub.cycle.dates(in: interval, anchor: sub.anchorDate, calendar: calendar).count
+                // 试用期不扣钱：billableDates 会把试用结束前的扣款日全部剔除
+                let hits = sub.billableDates(in: interval, calendar: calendar).count
                 guard hits > 0 else { continue }
                 sum = sum + convert(sub.price, to: code).multiplied(by: Decimal(hits))
             }
@@ -135,7 +136,7 @@ public extension VaultSnapshot {
         let interval = DateInterval(start: calendar.startOfDay(for: now), end: yearStart)
         var sum = Money.zero(code)
         for sub in subscriptions where sub.state == .active {
-            let hits = sub.cycle.dates(in: interval, anchor: sub.anchorDate, calendar: calendar).count
+            let hits = sub.billableDates(in: interval, calendar: calendar).count
             guard hits > 0 else { continue }
             sum = sum + convert(sub.price, to: code).multiplied(by: Decimal(hits))
         }

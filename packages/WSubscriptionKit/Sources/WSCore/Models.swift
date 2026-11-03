@@ -185,6 +185,19 @@ public struct Subscription: Identifiable, Codable, Hashable, Sendable {
                                           to: Calendar.ws.startOfDay(for: trialEndDate)).day
     }
 
+    /// 计费日集合（统计口径的唯一真源）：试用期内的扣款日不收钱，直接不返回。
+    /// 试用结束之后的扣款日正常返回；一次性买断不受影响。
+    public func billableDates(in interval: DateInterval,
+                              calendar: Calendar = .ws) -> [Date] {
+        guard isTrial, let trialEndDate else {
+            return cycle.dates(in: interval, anchor: anchorDate, calendar: calendar)
+        }
+        let billableStart = calendar.startOfDay(for: trialEndDate)
+        guard billableStart < interval.end else { return [] }
+        let window = DateInterval(start: max(interval.start, billableStart), end: interval.end)
+        return cycle.dates(in: window, anchor: anchorDate, calendar: calendar)
+    }
+
     /// 上一次已经发生的扣款日。用于账单卡上「上次扣款」这一栏。
     /// 往回找 25 个月，覆盖到最长的年付周期；买断只在建账日当天算一次。
     public func lastBillingDate(before reference: Date = Date(),
