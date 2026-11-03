@@ -19,6 +19,9 @@ public struct SettingsView: View {
     @State private var confirmCleanIcons = false
     @State private var confirmImportBackup = false
     @State private var showImportBackup = false
+    @State private var importPassphrase = ""
+    @State private var showImportPassphrase = false
+    @State private var importError: String?
     @State private var rateDrafts: [String: String] = [:]
 
     private static let vaultType: [UTType] = {
@@ -54,41 +57,13 @@ public struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("安全") {
-                    Button { showChangePassphrase = true } label: {
-                        row("修改密码", "key.fill")
-                    }
-                    .buttonStyle(.plain)
-
-                    Toggle(isOn: Binding(
-                        get: { model.biometryRegistered },
-                        set: { newValue in
-                            if newValue { Task { await model.setBiometry(true) } }
-                            else { confirmDisableBiometry = true }
-                        }
-                    )) {
-                        row(model.biometryKind == .faceID ? "Face ID 解锁" : "生物识别解锁",
-                            model.biometryKind == .faceID ? "faceid" : "touchid")
-                    }
-                    .disabled(model.biometryKind == .none)
-
-                    Picker(selection: Binding(
-                        get: { model.lockTimeout },
-                        set: { newValue in
-                            model.lockTimeout = newValue
-                            Task { await model.updateSettings { $0.lockTimeout = newValue } }
-                        }
-                    )) {
-                        ForEach(LockTimeout.allCases) { timeout in
-                            Text(timeout.displayName).tag(timeout)
-                        }
+                    // 默认不锁 App：库文件在磁盘是密文，主密钥在钥匙串，启动静默打开。
+                    LabeledContent {
+                        Text("库已加密")
+                            .foregroundStyle(.secondary)
                     } label: {
-                        row("自动锁定", "clock.fill")
+                        row("存储加密", "lock.fill")
                     }
-
-                    Button { Task { await model.lock() } } label: {
-                        row("立即锁定", "lock.fill", tint: Color(hex: "#D9363E"))
-                    }
-                    .buttonStyle(.plain)
                 }
 
                 Section("数据") {
@@ -221,9 +196,41 @@ public struct SettingsView: View {
                 switch result {
                 case .success(let urls):
                     guard let url = urls.first else { return }
-                    Task { await model.importVault(from: url) }
+                    Task {
+                        let ok = await model.importVault(from: url, passphrase: importPassphrase)
+                        if !ok { importError = model.flowError }
+                    }
                 case .failure:
                     break
+                }
+            }
+            .sheet(isPresented: $showImportPassphrase) {
+                NavigationStack {
+                    Form {
+                        Section("输入备份的密码") {
+                            SecureField("密码", text: $importPassphrase)
+                                .textContentType(.password)
+                        }
+                        if let importError {
+                            Section {
+                                Text(importError).font(.system(size: 12)).foregroundStyle(Color(hex: "#C4320A"))
+                            }
+                        }
+                    }
+                    .navigationTitle("导入备份")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("取消") { showImportPassphrase = false }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("选择文件") {
+                                showImportPassphrase = false
+                                showImportBackup = true
+                            }
+                            .disabled(importPassphrase.isEmpty)
+                        }
+                    }
                 }
             }
             .onAppear {
@@ -245,10 +252,10 @@ public struct SettingsView: View {
                 Button("取消", role: .cancel) {}
             }
             .confirmationDialog("导入备份会替换当前所有数据", isPresented: $confirmImportBackup, titleVisibility: .visible) {
-                Button("选择备份文件", role: .destructive) { showImportBackup = true }
+                Button("下一步", role: .destructive) { showImportPassphrase = true }
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("导入后需要用那份备份的密码解锁。")
+                Text("导入后需要用那份备份的密码打开。")
             }
         }
     }

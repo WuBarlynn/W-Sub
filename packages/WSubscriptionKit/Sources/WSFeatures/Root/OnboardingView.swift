@@ -3,20 +3,19 @@ import SwiftUI
 import UniformTypeIdentifiers
 import WSDesignSystem
 import WSCore
+import WSCrypto
 import WSVault
 
 public struct OnboardingView: View {
     @EnvironmentObject private var model: AppModel
 
     @State private var step = 0
-    @State private var passphrase = ""
-    @State private var confirm = ""
-    @State private var useBiometry = true
     @State private var recoveryCode: String?
-    @State private var acknowledged = false
     @State private var isWorking = false
     @State private var localError: String?
     @State private var showImport = false
+    @State private var importPassphrase = ""
+    @State private var importError: String?
 
     /// .vault 文件类型：动态 UTType，按扩展名匹配
     private static let vaultType: [UTType] = {
@@ -32,9 +31,7 @@ public struct OnboardingView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         switch step {
                         case 0: welcome
-                        case 1: storageStep
-                        case 2: passphraseStep
-                        default: recoveryStep
+                        default: storageStep
                         }
                         if let message = localError ?? model.flowError {
                             InlineNotice(message)
@@ -52,7 +49,7 @@ public struct OnboardingView: View {
             switch result {
             case .success(let urls):
                 guard let url = urls.first else { return }
-                Task { await model.importVault(from: url) }
+                Task { await model.importVault(from: url, passphrase: importPassphrase) }
             case .failure(let error):
                 localError = error.localizedDescription
             }
@@ -73,10 +70,10 @@ public struct OnboardingView: View {
         .padding(.top, 60)
     }
 
-    /// 数据保存说明。不再选文件夹：主存储固定在 App 内部，随时可导出加密备份。
+    /// 数据说明 + 建库 + 导入。数据加密存在 App 内部，无需密码即可打开（密钥在钥匙串里）。
     private var storageStep: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("数据保存")
+            Text("开始使用")
                 .font(.system(size: 28, weight: .semibold))
 
             SurfaceCard {
@@ -85,9 +82,9 @@ public struct OnboardingView: View {
                         .font(.system(size: 22))
                         .foregroundStyle(WSTheme.accent)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("加密后保存在 App 内部")
+                        Text("数据加密保存在 App 内部")
                             .font(.system(size: 15, weight: .medium))
-                        Text("可在设置中随时导出加密备份")
+                        Text("无需密码即可打开，随时可导出加密备份")
                             .font(.system(size: 12))
                             .foregroundStyle(.secondary)
                     }
@@ -95,93 +92,51 @@ public struct OnboardingView: View {
                 }
             }
 
-            Button {
-                showImport = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "square.and.arrow.down.on.square")
-                        .font(.system(size: 20))
-                        .foregroundStyle(WSTheme.accent)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("打开之前的库")
-                            .font(.system(size: 15, weight: .medium))
-                        Text("选择之前导出的 .vault 备份")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
+            // 导入旧库：需要输入那份备份的密码
+            VStack(alignment: .leading, spacing: 10) {
+                Button {
+                    showImport = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "square.and.arrow.down.on.square")
+                            .font(.system(size: 20))
+                            .foregroundStyle(WSTheme.accent)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("打开之前的库")
+                                .font(.system(size: 15, weight: .medium))
+                            Text("选择 .vault 备份，并输入它的密码")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.tertiary)
                     }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.tertiary)
                 }
-            }
-            .buttonStyle(.plain)
-            .padding(14)
-            .background(Color.wsCard, in: RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous)
-                    .strokeBorder(Color.wsHairline, lineWidth: 0.5)
-            }
-        }
-        .padding(.top, 24)
-    }
-
-    private var passphraseStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("设置密码")
-                .font(.system(size: 28, weight: .semibold))
-
-            SurfaceCard(padding: 14) {
-                VStack(spacing: 12) {
-                    SecureField("至少 8 位", text: $passphrase)
-                        .textContentType(.newPassword)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .font(.system(size: 16))
-                    WSRowDivider()
-                    SecureField("再输入一次", text: $confirm)
-                        .textContentType(.newPassword)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .font(.system(size: 16))
+                .buttonStyle(.plain)
+                .padding(14)
+                .background(Color.wsCard, in: RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: WSTheme.cardRadius, style: .continuous)
+                        .strokeBorder(Color.wsHairline, lineWidth: 0.5)
                 }
-            }
 
-            if model.biometryKind != .none {
-                SurfaceCard(padding: 14) {
-                    Toggle("同时启用 \(model.biometryKind.displayName)", isOn: $useBiometry)
-                        .font(.system(size: 15))
-                }
-            }
-        }
-        .padding(.top, 24)
-    }
-
-    private var recoveryStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("保存恢复码")
-                .font(.system(size: 28, weight: .semibold))
-
-            SurfaceCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(recoveryCode ?? "—")
-                        .font(.system(size: 16, weight: .medium, design: .monospaced))
-                        .lineSpacing(7)
-                        .textSelection(.enabled)
-                    Button {
-                        UIPasteboard.general.string = recoveryCode
-                    } label: {
-                        Label("复制", systemImage: "doc.on.doc")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                }
-            }
-
-            SurfaceCard(padding: 14) {
-                Toggle("我已保存", isOn: $acknowledged)
+                SecureField("备份的密码", text: $importPassphrase)
+                    .textContentType(.password)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
                     .font(.system(size: 15))
+                    .padding(12)
+                    .background(Color.wsCard, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color.wsHairline, lineWidth: 0.5)
+                    }
+
+                if let importError {
+                    InlineNotice(importError)
+                }
             }
         }
         .padding(.top, 24)
@@ -192,25 +147,14 @@ public struct OnboardingView: View {
             switch step {
             case 0:
                 primary("开始") { advance() }
-            case 1:
-                primary("下一步") { advance() }
-            case 2:
-                primary(isWorking ? "创建中…" : "创建", enabled: canCreate) {
-                    Task { await create() }
-                }
             default:
-                primary("完成", enabled: acknowledged) {
-                    model.clearMessages()
-                    model.completeOnboarding()
+                primary(isWorking ? "创建中…" : "创建并开始使用") {
+                    Task { await create() }
                 }
             }
         }
         .padding(.horizontal, WSTheme.pagePadding)
         .padding(.bottom, 10)
-    }
-
-    private var canCreate: Bool {
-        passphrase.count >= 8 && passphrase == confirm && !isWorking
     }
 
     private func primary(_ title: String, enabled: Bool = true, action: @escaping () -> Void) -> some View {
@@ -235,14 +179,18 @@ public struct OnboardingView: View {
         withAnimation(.easeInOut(duration: 0.2)) { step += 1 }
     }
 
+    /// 建库：用随机高熵密码做信封（用户无需知道），主密钥存钥匙串，启动静默解锁。
     private func create() async {
         isWorking = true
         localError = nil
         defer { isWorking = false }
         do {
-            recoveryCode = try await model.createVault(passphrase: passphrase,
-                                                       enableBiometry: useBiometry)
-            withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
+            // 随机 32 字节口令，转 base64；用户不接触它，信封仍强加密
+            let random = try SecureBytes.random(count: 32)
+            let passphrase = Data(random.bytes).base64EncodedString()
+            recoveryCode = try await model.createVault(passphrase: passphrase, enableBiometry: false)
+            // 建库后直接进入主界面（createVault 内部已把 MK 存钥匙串、snapshot 就位）
+            model.completeOnboarding()
         } catch {
             localError = AppModel.describe(error)
         }

@@ -78,7 +78,7 @@ final class VaultStoreTests: XCTestCase {
 
     func testCreateWritesFileAndUnlockRestoresData() async throws {
         let store = makeStore()
-        let (created, recovery) = try await store.createVault(initial: sampleSnapshot(), passphrase: "pw-123456")
+        let (created, recovery, _) = try await store.createVault(initial: sampleSnapshot(), passphrase: "pw-123456")
         XCTAssertEqual(created.subscriptions.count, 1)
         XCTAssertTrue(FileManager.default.fileExists(atPath: directory.appendingPathComponent("WSubscription.vault").path))
 
@@ -111,7 +111,7 @@ final class VaultStoreTests: XCTestCase {
 
     func testRecoveryKeyUnlock() async throws {
         let store = makeStore()
-        let (_, recovery) = try await store.createVault(initial: sampleSnapshot(), passphrase: "pw")
+        let (_, recovery, _) = try await store.createVault(initial: sampleSnapshot(), passphrase: "pw")
         await store.lock()
         let snapshot = try await store.unlockWithRecoveryKey(recovery)
         XCTAssertEqual(snapshot.subscriptions.count, 1)

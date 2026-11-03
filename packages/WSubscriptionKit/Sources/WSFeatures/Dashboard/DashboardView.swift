@@ -124,15 +124,6 @@ public struct HomeView: View {
             .navigationTitle(AppTab.dashboard.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        Task { await model.lock() }
-                    } label: {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .accessibilityLabel("锁定")
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showAdd = true
@@ -607,7 +598,7 @@ private struct SubscriptionDeckCard: View, Equatable {
                             Circle()
                                 .fill(.white.opacity(0.22))
                                 .frame(width: 4, height: 4)
-                            Text(WSDate.monthDay(date))
+                            Text(WSDate.monthDayWithYear(date))
                                 .font(.system(size: 11))
                                 .foregroundStyle(.white.opacity(0.5))
                             Spacer(minLength: 8)
@@ -629,7 +620,7 @@ private struct SubscriptionDeckCard: View, Equatable {
 
             HStack(alignment: .top, spacing: 10) {
                 stat("周期", subscription.cycle.displayName)
-                stat("上次扣款", subscription.isTrial ? "—" : (subscription.lastBillingDate().map { WSDate.monthDay($0) } ?? "—"))
+                stat("上次扣款", subscription.isTrial ? "—" : (subscription.lastBillingDate().map { WSDate.monthDayWithYear($0) } ?? "—"))
                 stat("已订", subscribedText)
             }
 
@@ -772,7 +763,7 @@ private struct SubscriptionDeckCard: View, Equatable {
         if days <= 0 { return "今天" }
         if days == 1 { return "明天" }
         if days <= 60 { return "\(days) 天后" }
-        return subscription.nextBillingDate().map { WSDate.monthDay($0) } ?? "—"
+        return subscription.nextBillingDate().map { WSDate.monthDayWithYear($0) } ?? "—"
     }
 
     private var countdownTint: Color {
@@ -841,7 +832,7 @@ public struct SubscriptionRowCell: View {
             return subscription.cycle.shortLabel
         case .priceAndDate:
             guard let date = subscription.nextBillingDate() else { return "已结束" }
-            return WSDate.monthDay(date)
+            return WSDate.monthDayWithYear(date)
         case .dayCount:
             guard let days = subscription.daysUntilNextBilling() else { return "—" }
             return days <= 0 ? "今天" : "\(days) 天"

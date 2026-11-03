@@ -96,6 +96,10 @@ public final class AppModel: ObservableObject {
             await startDemo()
             return
         }
+        if ProcessInfo.processInfo.arguments.contains("-ws-create") {
+            await startCreate()
+            return
+        }
         #endif
 
         // 主存储固定在 App 内部 Documents（UIFileSharingEnabled 已开，
@@ -109,12 +113,41 @@ public final class AppModel: ObservableObject {
         if await store.hasFile == false, await migrateLegacyVault(into: directory) {
             self.store = VaultStore(store: VaultFileStore(access: FolderAccess(url: directory)))
         }
+        #if DEBUG
+        let directExists = FileManager.default.fileExists(atPath: Self.vaultDirectory.appendingPathComponent("WSubscription.vault").path)
+        NSLog("[WSub] direct file exists = %@, keychain = %@", String(directExists), String(MasterKeyStore.load() != nil))
+        #endif
 
         if await self.store?.hasFile == true {
-            biometryRegistered = (await self.store?.headerSummary())?.hasBiometric ?? false
-            subscribe(to: self.store!)
-            phase = .locked
+            // 默认：用钥匙串里的主密钥静默解锁，直接进入主界面，不弹锁屏
+            if let key = MasterKeyStore.load() {
+                #if DEBUG
+                print("[WSub] keychain MK found, unlocking silently")
+                #endif
+                do {
+                    snapshot = try await self.store?.unlock(withMasterKey: key)
+                    subscribe(to: self.store!)
+                    phase = .ready
+                    await finishUnlockSideEffects()
+                    folderName = "App 内部"
+                    return
+                } catch {
+                    MasterKeyStore.delete()
+                    #if DEBUG
+                    print("[WSub] keychain MK failed:", error)
+                    #endif
+                }
+            } else {
+                #if DEBUG
+                print("[WSub] no keychain MK, file exists")
+                #endif
+            }
+            phase = .onboarding
+            notice = "需要导入备份或用恢复码打开"
         } else {
+            #if DEBUG
+            print("[WSub] no vault file")
+            #endif
             phase = .onboarding
         }
         folderName = "App 内部"
@@ -163,11 +196,22 @@ public final class AppModel: ObservableObject {
         let result = try await store.createVault(initial: VaultSnapshot(),
                                                  passphrase: passphrase,
                                                  biometricPublicKey: publicKey)
+        #if DEBUG
+        NSLog("[WSub] createVault wrote file, exists = %@",
+              String(FileManager.default.fileExists(atPath: Self.vaultDirectory.appendingPathComponent("WSubscription.vault").path)))
+        NSLog("[WSub] vaultDirectory = %@", Self.vaultDirectory.path)
+        #endif
+        // 主密钥存钥匙串：启动时静默解锁，用户无需输密码（库文件本身仍是密文）
+        let kcStatus = MasterKeyStore.save(result.masterKey)
+        #if DEBUG
+        NSLog("[WSub] keychain save status = %d, reload = %@", kcStatus, String(MasterKeyStore.load() != nil))
+        #endif
         folderName = "App 内部"
         biometryRegistered = publicKey != nil
         snapshot = result.snapshot
         subscribe(to: store)
         await finishUnlockSideEffects()
+        phase = .ready
         return result.recoveryKey
     }
 
@@ -359,17 +403,18 @@ public final class AppModel: ObservableObject {
         }
     }
 
-    /// 用之前导出的加密备份替换当前库。成功后回到锁定页，用原库的密码解锁。
-    public func importVault(from url: URL) async {
+    /// 用之前导出的加密备份替换当前库。需要输入那份备份的密码，解出主密钥存进钥匙串。
+    public func importVault(from url: URL, passphrase: String) async -> Bool {
         isBusy = true
         defer { isBusy = false }
         do {
             let data = try Data(contentsOf: url)
-            // 先校验文件结构，避免把随便选的文件当成库写进去
-            _ = try VaultFileCodec.header(of: data)
+            // 用密码解出主密钥，同时校验文件有效
+            let key = try VaultKeyring.masterKey(passphrase: passphrase, fileData: data)
             let destination = Self.vaultDirectory.appendingPathComponent("WSubscription.vault")
             try data.write(to: destination, options: .atomic)
-            // 重置运行态，重新走启动流程（phase 会落到 .locked）
+            MasterKeyStore.save(key)
+            // 重置运行态，重新走启动流程（会用钥匙串里的 MK 静默进入）
             eventTask?.cancel()
             eventTask = nil
             await store?.lock(flushFirst: false)
@@ -377,8 +422,10 @@ public final class AppModel: ObservableObject {
             snapshot = nil
             detectedRollback = false
             await bootstrap()
+            return true
         } catch {
-            flowError = "这不是有效的 W Sub 备份文件"
+            flowError = "密码不正确，或这不是有效的备份文件"
+            return false
         }
     }
 
@@ -439,12 +486,8 @@ public final class AppModel: ObservableObject {
     }
 
     public func handleActive() {
-        defer { backgroundedAt = nil }
-        guard phase == .ready, let backgroundedAt else { return }
-        let timeout = lockTimeout.seconds
-        if Date().timeIntervalSince(backgroundedAt) >= timeout {
-            Task { await lock() }
-        }
+        // 默认不启用锁屏：切回前台不锁定，用户随时可看。
+        backgroundedAt = nil
     }
 
     // MARK: - 事件订阅
@@ -523,6 +566,19 @@ public final class AppModel: ObservableObject {
         if ProcessInfo.processInfo.arguments.contains("-ws-lock") {
             biometryRegistered = false
             await lock()
+        }
+    }
+
+    /// 调试：模拟真实建库流程（随机口令信封 + MK 存钥匙串），验证「建库后直接进主界面、无锁屏」。
+    private func startCreate() async {
+        do {
+            let random = try SecureBytes.random(count: 32)
+            let passphrase = Data(random.bytes).base64EncodedString()
+            _ = try await createVault(passphrase: passphrase, enableBiometry: false)
+            // createVault 内部已设 phase = .ready，这里无需再处理
+        } catch {
+            phase = .onboarding
+            flowError = AppModel.describe(error)
         }
     }
     #endif

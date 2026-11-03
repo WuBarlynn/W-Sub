@@ -10,6 +10,17 @@ public enum WSDate {
         date.formatted(.dateTime.month().day().locale(locale))
     }
 
+    /// 月日 + 年份：同年只显示月日，跨年才带年份（例如「11月7日」「2027年1月3日」）。
+    /// 主页卡片、订阅列表这类紧凑场景用，避免常年重复显示当年年份。
+    public static func monthDayWithYear(_ date: Date, now: Date = Date(), calendar: Calendar = .ws) -> String {
+        let isThisYear = calendar.component(.year, from: date) == calendar.component(.year, from: now)
+        if isThisYear {
+            return date.formatted(.dateTime.month().day().locale(locale))
+        }
+        return date.formatted(.dateTime.year().month().day().locale(locale))
+    }
+
+    /// 始终带年份（详情页、导出等需要完整日期的场景）。
     public static func full(_ date: Date) -> String {
         date.formatted(.dateTime.year().month().day().locale(locale))
     }

@@ -77,7 +77,7 @@ public actor VaultStore {
     public func createVault(initial: VaultSnapshot,
                             passphrase: String,
                             recoveryKey: String? = nil,
-                            biometricPublicKey: Data? = nil) async throws -> (snapshot: VaultSnapshot, recoveryKey: String) {
+                            biometricPublicKey: Data? = nil) async throws -> (snapshot: VaultSnapshot, recoveryKey: String, masterKey: SecureBytes) {
         var snapshot = initial
         snapshot.schemaVersion = SchemaMigrator.currentVersion
         snapshot.settings.biometryEnabled = biometricPublicKey != nil
@@ -103,7 +103,7 @@ public actor VaultStore {
         self.isDirty = false
         ledger.record(1)
         emit(.unlocked)
-        return (snapshot, creation.recoveryKey)
+        return (snapshot, creation.recoveryKey, creation.masterKey)
     }
 
     // MARK: - 解锁
@@ -125,6 +125,11 @@ public actor VaultStore {
         try await performUnlock { fileData in
             try VaultKeyring.masterKey(fileData: fileData, sharedSecretProvider: sharedSecretProvider)
         }
+    }
+
+    /// 直接用已有的主密钥解锁（默认路径：主密钥存 Keychain，启动静默解密，无需用户交互）。
+    public func unlock(withMasterKey key: SecureBytes) async throws -> VaultSnapshot {
+        try await performUnlock { _ in key }
     }
 
     private func performUnlock(_ keyProvider: (Data) throws -> SecureBytes) async throws -> VaultSnapshot {
