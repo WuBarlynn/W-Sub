@@ -217,8 +217,15 @@ private struct SubscriptionDeck: View {
         return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
             .equatable()
             .frame(height: height)
-            // 后面的卡逐个递减透明度，淡入页面背景，比压黑更轻
-            .opacity(stackOpacity(d))
+            // 后面的卡叠一层黑表达层次：这个 overlay 是纯色，SwiftUI 会把它合并成一次绘制，
+            // 不触发卡片内容的 body 重算（卡片的 Equatable 只比 subscription + isDark）
+            .overlay {
+                if d > 0 {
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .fill(.black.opacity(0.30 * Double(min(2, d))))
+                        .allowsHitTesting(false)
+                }
+            }
             .scaleEffect(x: scaleX(d), y: 1, anchor: .top)
             .offset(y: offset(d, height: height))
             .zIndex(zIndex(for: i))
@@ -227,12 +234,6 @@ private struct SubscriptionDeck: View {
     }
 
     // MARK: 变换：d 的单一连续函数（没有 index 分支，这是消除跳动的关键）
-
-    /// 堆叠中的卡逐个递减透明度：第一张 0.55，第二张 0.28，淡进背景。
-    private func stackOpacity(_ d: CGFloat) -> Double {
-        guard d > 0 else { return 1 }
-        return max(0.25, 1 - 0.45 * Double(min(2, d)))
-    }
 
     /// 堆叠中的卡只横向收窄（不缩高度）：
     /// 高度不变 + 向下偏移，底部才能露出一条边；等比缩小会把露边抵消掉。
@@ -445,7 +446,8 @@ private struct SubscriptionDeckCard: View, Equatable {
     nonisolated let subscription: Subscription
     nonisolated let isDark: Bool
 
-    /// 拖动时外层每帧都会重新构建这个值；相等就跳过 body，避免整张卡重排
+    /// 拖动时外层每帧都会重建这个值；相等就跳过 body，避免整张卡重排。
+    /// 卡片不持有任何随 position 变化的字段，淡入效果在 deck 层的 overlay 上完成。
     nonisolated static func == (lhs: SubscriptionDeckCard, rhs: SubscriptionDeckCard) -> Bool {
         lhs.subscription == rhs.subscription && lhs.isDark == rhs.isDark
     }
@@ -515,6 +517,10 @@ private struct SubscriptionDeckCard: View, Equatable {
         .frame(height: 62)
         .frame(maxWidth: .infinity)
         .background(.white.opacity(colorScheme == .dark ? 0.88 : 0.92))
+        // 顶部横条覆盖卡片顶部两个圆角，避免圆角处露出深色背景形成黑边
+        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 32, bottomLeadingRadius: 0,
+                                          bottomTrailingRadius: 0, topTrailingRadius: 32,
+                                          style: .continuous))
     }
 
     private func bandTag(_ text: String) -> some View {
