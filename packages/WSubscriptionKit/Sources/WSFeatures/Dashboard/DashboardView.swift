@@ -173,198 +173,120 @@ public struct HomeView: View {
 
 // MARK: - 卡片叠
 
-/// 独立成一个视图。卡片叠用 UIKit 驱动：`UIPanGestureRecognizer` 每帧直接改 `layer.transform`
-/// （Core Animation 合成），绕过 SwiftUI 的视图 diff 管线，ProMotion 屏可跑满 120Hz。
-/// 卡片本身仍是 SwiftUI（`UIHostingController`），只是「拖动/翻页」这个高频操作交给 UIKit。
-@MainActor
-private struct SubscriptionDeck: UIViewRepresentable {
+private struct SubscriptionDeck: View {
     let items: [Subscription]
     @Binding var index: Int
     let onSelect: (Subscription) -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var position: CGFloat = 0
+    @State private var dragStart: CGFloat?
+    /// 后面的卡向下错开的距离：堆叠在底部露边
     private let stackGap: CGFloat = 10
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(items: items, index: $index, onSelect: onSelect, stackGap: stackGap)
-    }
-
-    func makeUIView(context: Context) -> DeckView {
-        let view = DeckView(coordinator: context.coordinator)
-        view.rebuild()
-        return view
-    }
-
-    func updateUIView(_ view: DeckView, context: Context) {
-        view.coordinator.items = items
-        view.coordinator.onSelect = onSelect
-        view.coordinator.isDark = context.environment.colorScheme == .dark
-        view.rebuild()
-    }
-
-    // MARK: - UIKit 卡片叠视图
-
-    @MainActor
-    final class DeckView: UIView {
-        let coordinator: Coordinator
-        var cardViews: [(container: UIView, hosting: UIHostingController<SubscriptionDeckCard>, dimLayer: CALayer)] = []
-
-        init(coordinator: Coordinator) {
-            self.coordinator = coordinator
-            super.init(frame: .zero)
-            clipsToBounds = true
-            isMultipleTouchEnabled = false
-            backgroundColor = .clear
-
-            let pan = UIPanGestureRecognizer(target: coordinator, action: #selector(Coordinator.handlePan(_:)))
-            pan.maximumNumberOfTouches = 1
-            addGestureRecognizer(pan)
-        }
-        required init?(coder: NSCoder) { fatalError() }
-
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            coordinator.cardHeight = max(300, bounds.height - coordinator.stackGap * 2.4)
-            applyTransforms(animated: false)
-        }
-
-        func rebuild() {
-            cardViews.forEach { $0.hosting.view.removeFromSuperview() }
-            cardViews = []
-            let indices = coordinator.visibleIndices
-            for i in indices {
-                let item = coordinator.items[i]
-                let card = SubscriptionDeckCard(subscription: item, isDark: coordinator.isDark)
-                let hosting = UIHostingController(rootView: card)
-                hosting.view.backgroundColor = .clear
-                let container = UIView()
-                container.backgroundColor = .clear
-                container.clipsToBounds = true
-                container.layer.cornerRadius = 32
-                container.layer.cornerCurve = .continuous
-                container.addSubview(hosting.view)
-                // 压黑层
-                let dim = CALayer()
-                dim.backgroundColor = UIColor.black.cgColor
-                dim.cornerRadius = 32
-                dim.cornerCurve = .continuous
-                dim.isHidden = true
-                container.layer.addSublayer(dim)
-                // 后面的卡先加（在下面），当前卡最后加（在上面）
-                addSubview(container)
-                cardViews.append((container, hosting, dim))
-            }
-            setNeedsLayout()
-            layoutIfNeeded()
-            // 点击进详情（只响应当前卡）
-            let tap = UITapGestureRecognizer(target: coordinator, action: #selector(Coordinator.handleTap(_:)))
-            addGestureRecognizer(tap)
-        }
-
-        /// 层级：用 subview 顺序表达（bringSubviewToFront）。
-        /// 上滑时当前卡最上；下滑返回时上一张升到最上。后面的卡按距离排在下面。
-        func arrangeZOrder() {
-            let current = coordinator.index.wrappedValue
-            let returning = coordinator.position < CGFloat(current)
-            // 先全部移到最底，再按「从后往前」的顺序叠上来
-            for entry in cardViews { sendSubviewToBack(entry.container) }
-            for (i, entry) in cardViews.enumerated() {
-                let itemIndex = coordinator.visibleIndices[i]
-                if itemIndex == current { bringSubviewToFront(entry.container) }
-                else if itemIndex == current - 1, returning { bringSubviewToFront(entry.container) }
-            }
-        }
-
-        func applyTransforms(animated: Bool, completion: ((Bool) -> Void)? = nil) {
-            let height = coordinator.cardHeight
-            let width = bounds.width
-            let gap = coordinator.stackGap
-            for (i, entry) in cardViews.enumerated() {
-                let itemIndex = coordinator.visibleIndices[i]
-                let d = CGFloat(itemIndex) - coordinator.position
-                let container = entry.container
-                container.frame = CGRect(x: 0, y: 0, width: width, height: height)
-                entry.hosting.view.frame = container.bounds
-                entry.dimLayer.frame = container.bounds
-
-                // scaleX / offsetY / opacity —— 全部写进 layer，Core Animation 合成
-                let scaleX = d >= 0 ? 1 - 0.05 * min(2, d) : 1
-                let offsetY: CGFloat = d >= 0 ? gap * d : d * height
-                let opacity = d >= 0 ? max(0.24, 1 - 0.42 * min(2, d)) : 1
-
-                let transform = CGAffineTransform(translationX: 0, y: offsetY)
-                    .scaledBy(x: scaleX, y: 1)
-                let animations = {
-                    container.layer.transform = CATransform3DMakeAffineTransform(transform)
-                    container.layer.opacity = Float(opacity)
-                    entry.hosting.view.layer.transform = CATransform3DIdentity
-                    entry.hosting.view.layer.opacity = 1
-                    // 后面的卡叠一层黑（d > 0）
-                    entry.dimLayer.isHidden = d <= 0
-                    entry.dimLayer.opacity = d > 0 ? Float(0.22 * min(2, d)) : 0
-                    // 层级：下滑返回时上一张在最上
-                    self.arrangeZOrder()
-                }
-                if animated {
-                    UIView.animate(withDuration: 0.36, delay: 0,
-                                   usingSpringWithDamping: 0.9,
-                                   initialSpringVelocity: 0,
-                                   options: [.allowUserInteraction, .beginFromCurrentState],
-                                   animations: animations, completion: completion)
-                } else {
-                    animations()
-                    completion?(true)
+    var body: some View {
+        GeometryReader { proxy in
+            let height = max(300, proxy.size.height - stackGap * 2.4)
+            ZStack(alignment: .top) {
+                ForEach(visible, id: \.item.id) { entry in
+                    card(entry, height: height)
                 }
             }
+            // 显式给 ZStack 一个确定的高度（= 容器高度），否则它只撑到卡片高度，
+            // 露边卡向下偏移露出的部分会被 clipped 裁掉
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(height: proxy.size.height, alignment: .top)
+            .clipped()
+            .contentShape(Rectangle())
+            .gesture(dragGesture)
+            .onAppear { cardHeight = height }
+            .onChange(of: height) { _, newValue in cardHeight = newValue }
         }
     }
 
-    // MARK: - Coordinator
+    /// 窗口以已提交的 index 为基准：拖动与翻页动画过程中不增删视图。
+    private var visible: [(item: Subscription, index: Int)] {
+        guard !items.isEmpty else { return [] }
+        let lower = max(0, index - 1)
+        let upper = min(items.count - 1, index + 2)
+        guard lower <= upper else { return [] }
+        return (lower...upper).map { (items[$0], $0) }
+    }
 
-    @MainActor
-    final class Coordinator: NSObject {
-        var items: [Subscription]
-        var index: Binding<Int>
-        var onSelect: (Subscription) -> Void
-        let stackGap: CGFloat
+    private func card(_ entry: (item: Subscription, index: Int), height: CGFloat) -> some View {
+        let i = entry.index
+        // d 只由 position 决定：0 = 就位，正数 = 堆叠在下面，负数 = 已翻走
+        let d = CGFloat(i) - position
+        return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
+            .equatable()
+            .frame(height: height)
+            // 后面的卡逐渐淡出：整卡 opacity 只做 GPU 合成（卡片 body 已静态，不触发重算），
+            // 同时叠一层黑表达「在下面的层次」。两个都是纯合成，不掉帧。
+            .opacity(stackOpacity(d))
+            .overlay {
+                if d > 0 {
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .fill(.black.opacity(0.22 * Double(min(2, d))))
+                        .allowsHitTesting(false)
+                }
+            }
+            .scaleEffect(x: scaleX(d), y: 1, anchor: .top)
+            .offset(y: offset(d, height: height))
+            .zIndex(zIndex(for: i))
+            .allowsHitTesting(i == index)
+            .onTapGesture { if i == index { onSelect(entry.item) } }
+    }
 
-        var isDark: Bool = false
-        var position: CGFloat = 0
-        var cardHeight: CGFloat = 420
-        private var dragStartPosition: CGFloat = 0
-        private var dragStartY: CGFloat = 0
+    // MARK: 变换：d 的单一连续函数（没有 index 分支，这是消除跳动的关键）
 
-        init(items: [Subscription], index: Binding<Int>, onSelect: @escaping (Subscription) -> Void, stackGap: CGFloat) {
-            self.items = items
-            self.index = index
-            self.onSelect = onSelect
-            self.stackGap = stackGap
-        }
+    /// 后面的卡逐个淡出：第一张 0.66，第二张 0.30，淡进背景，层次清晰。
+    private func stackOpacity(_ d: CGFloat) -> Double {
+        guard d > 0 else { return 1 }
+        return max(0.24, 1 - 0.42 * Double(min(2, d)))
+    }
 
-        var visibleIndices: [Int] {
-            guard !items.isEmpty else { return [] }
-            let current = index.wrappedValue
-            let lower = max(0, current - 1)
-            let upper = min(items.count - 1, current + 2)
-            guard lower <= upper else { return [] }
-            return Array(lower...upper)
-        }
+    /// 堆叠中的卡只横向收窄（不缩高度）：
+    /// 高度不变 + 向下偏移，底部才能露出一条边；等比缩小会把露边抵消掉。
+    private func scaleX(_ d: CGFloat) -> CGFloat {
+        d >= 0 ? 1 - 0.05 * min(2, d) : 1
+    }
 
-        @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
-            guard let view = gesture.view as? DeckView else { return }
-            switch gesture.state {
-            case .began:
-                dragStartPosition = position
-                dragStartY = gesture.translation(in: view).y
-            case .changed:
-                let dy = gesture.translation(in: view).y - dragStartY
-                let delta = -dy / max(1, cardHeight)
-                position = rubberBand(dragStartPosition + delta)
-                view.applyTransforms(animated: false)
-            case .ended, .cancelled:
-                let translation = -gesture.translation(in: view).y / max(1, cardHeight)
-                let velocity = gesture.velocity(in: view).y
-                let predicted = -velocity * 0.25 / max(1, cardHeight)
-                let base = dragStartPosition.rounded()
+    /// d >= 0：堆叠的卡向下错开 stackGap，底部露边；
+    /// d < 0：翻走的卡按 1:1 跟手向上飞出（d 每减 1，位移正好一整张卡高）。
+    private func offset(_ d: CGFloat, height: CGFloat) -> CGFloat {
+        d >= 0 ? stackGap * d : d * height
+    }
+
+    /// 正在往回翻（下滑，position 小于当前 index）时，从上方回来的那张卡必须盖在当前卡之上，
+    /// 否则它会从当前卡「下面」滑出来，看起来很奇怪。
+    /// 上滑时当前卡始终在最上，飞走后露出下一张。
+    private var returning: Bool { position < CGFloat(index) }
+
+    private func zIndex(for i: Int) -> Double {
+        if i == index { return returning ? 90 : 100 }
+        if i == index - 1 { return returning ? 110 : 80 }
+        if i < index { return 80 }
+        return Double(80 - (i - index))
+    }
+
+    // MARK: 手势
+
+    private var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                if dragStart == nil { dragStart = position }
+                let start = dragStart ?? position
+                position = rubberBand(start - value.translation.height / max(1, cardHeight))
+            }
+            .onEnded { value in
+                let start = dragStart ?? position
+                dragStart = nil
+
+                // 位移过卡片高度的 18%，或快速一甩（预测过 45%）才翻页
+                let translation = -value.translation.height / max(1, cardHeight)
+                let predicted = -value.predictedEndTranslation.height / max(1, cardHeight)
+                let base = start.rounded()
+
                 var target = base
                 if translation > 0.18 || predicted > 0.45 {
                     target = base + 1
@@ -372,37 +294,26 @@ private struct SubscriptionDeck: UIViewRepresentable {
                     target = base - 1
                 }
                 target = min(max(0, target), CGFloat(max(0, items.count - 1)))
-                position = target
-                view.applyTransforms(animated: true) { _ in
-                    let settled = Int(self.position.rounded())
-                    if settled != self.index.wrappedValue {
-                        DispatchQueue.main.async { self.index.wrappedValue = settled }
-                    }
-                }
-            default:
-                break
-            }
-        }
 
-        @objc func handleTap(_ gesture: UITapGestureRecognizer) {
-            let point = gesture.location(in: gesture.view)
-            guard let view = gesture.view as? DeckView else { return }
-            // 只响应当前卡
-            let current = index.wrappedValue
-            for (i, entry) in view.cardViews.enumerated() where visibleIndices[i] == current {
-                if entry.container.frame.contains(point) {
-                    onSelect(items[current])
-                    return
+                withAnimation(.spring(response: 0.36, dampingFraction: 0.9)) {
+                    position = target
+                } completion: {
+                    // index 只在动画彻底落位后提交：
+                    // 窗口、层级、页码计数都不在拖动中途变化
+                    let settled = Int(position.rounded())
+                    if settled != index { index = settled }
                 }
             }
-        }
+    }
 
-        private func rubberBand(_ value: CGFloat) -> CGFloat {
-            let maxIndex = CGFloat(max(0, items.count - 1))
-            if value < 0 { return value * 0.28 }
-            if value > maxIndex { return maxIndex + (value - maxIndex) * 0.28 }
-            return value
-        }
+    /// 手指位移换算成 position 的基准高度（拖动开始时记一次）
+    @State private var cardHeight: CGFloat = 420
+
+    private func rubberBand(_ value: CGFloat) -> CGFloat {
+        let maxIndex = CGFloat(max(0, items.count - 1))
+        if value < 0 { return value * 0.28 }
+        if value > maxIndex { return maxIndex + (value - maxIndex) * 0.28 }
+        return value
     }
 }
 
