@@ -182,7 +182,7 @@ private struct SubscriptionDeck: View {
     @State private var position: CGFloat = 0
     @State private var dragStart: CGFloat?
     /// 后面的卡向下错开的距离：堆叠在底部露边
-    private let stackGap: CGFloat = 7
+    private let stackGap: CGFloat = 10
 
     var body: some View {
         GeometryReader { proxy in
@@ -217,12 +217,13 @@ private struct SubscriptionDeck: View {
         return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
             .equatable()
             .frame(height: height)
-            // 后面的卡叠一层黑表达层次：这个 overlay 是纯色，SwiftUI 会把它合并成一次绘制，
-            // 不触发卡片内容的 body 重算（卡片的 Equatable 只比 subscription + isDark）
+            // 后面的卡逐渐淡出：整卡 opacity 只做 GPU 合成（卡片 body 已静态，不触发重算），
+            // 同时叠一层黑表达「在下面的层次」。两个都是纯合成，不掉帧。
+            .opacity(stackOpacity(d))
             .overlay {
                 if d > 0 {
                     RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .fill(.black.opacity(0.30 * Double(min(2, d))))
+                        .fill(.black.opacity(0.22 * Double(min(2, d))))
                         .allowsHitTesting(false)
                 }
             }
@@ -234,6 +235,12 @@ private struct SubscriptionDeck: View {
     }
 
     // MARK: 变换：d 的单一连续函数（没有 index 分支，这是消除跳动的关键）
+
+    /// 后面的卡逐个淡出：第一张 0.66，第二张 0.30，淡进背景，层次清晰。
+    private func stackOpacity(_ d: CGFloat) -> Double {
+        guard d > 0 else { return 1 }
+        return max(0.24, 1 - 0.42 * Double(min(2, d)))
+    }
 
     /// 堆叠中的卡只横向收窄（不缩高度）：
     /// 高度不变 + 向下偏移，底部才能露出一条边；等比缩小会把露边抵消掉。
