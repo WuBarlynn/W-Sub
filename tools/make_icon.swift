@@ -1,4 +1,5 @@
 import AppKit
+import CoreText
 import CoreGraphics
 import ImageIO
 import UniformTypeIdentifiers
@@ -50,59 +51,24 @@ drawCard(centerY: 622, scale: 0.86, alpha: 0.34)
 drawCard(centerY: 526, scale: 0.93, alpha: 0.60)
 drawCard(centerY: 430, scale: 1.00, alpha: 1.00)
 
-if variant == "renew" {
+if variant == "renew" || variant == "w" {
+    // 前面那张卡中间放一个 W：SF Rounded Heavy，用 CoreText 画真实的字形，
+    // 比手掰折线稳，缩到 60pt 也不会散。
     let center = CGPoint(x: canvas / 2, y: 430)
-    let radius: CGFloat = 132
-    let lineWidth: CGFloat = 48
-    let halfWidth = lineWidth / 2
+    let base = NSFont.systemFont(ofSize: 430, weight: .heavy)
+    let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
+    let font = NSFont(descriptor: descriptor, size: 430) ?? base
 
-    func radians(_ degrees: CGFloat) -> CGFloat { degrees * CGFloat.pi / 180 }
-    func point(_ angle: CGFloat, _ r: CGFloat) -> CGPoint {
-        CGPoint(x: center.x + cos(angle) * r, y: center.y + sin(angle) * r)
-    }
+    let attributed = NSAttributedString(string: "W", attributes: [
+        .font: font,
+        NSAttributedString.Key(kCTForegroundColorAttributeName as String): brand
+    ])
+    let line = CTLineCreateWithAttributedString(attributed)
+    let bounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
 
-    // 缺口在右下角：尾巴在右侧（斜切），箭头在正下方
-    let baseAngle = radians(-88)
-    let tailAngle = radians(-2)
-    let chisel = radians(6)
-    let tipAngle = baseAngle + radians(34)
-
-    let outerStart = tailAngle + chisel
-    let innerEnd = tailAngle - chisel
-
-    // 以缺口中心（-45°）为轴做镜像：缺口还留在右下角，箭头方向反过来
-    ctx.saveGState()
-    ctx.translateBy(x: center.x, y: center.y)
-    ctx.rotate(by: radians(-45))
-    ctx.scaleBy(x: 1, y: -1)
-    ctx.rotate(by: radians(45))
-    ctx.translateBy(x: -center.x, y: -center.y)
-
-    // 环身：上沿从斜切口逆时针绕到箭头根部，再沿内沿绕回
-    let ring = CGMutablePath()
-    ring.move(to: point(innerEnd, radius - halfWidth))
-    ring.addLine(to: point(outerStart, radius + halfWidth))
-    ring.addArc(center: center, radius: radius + halfWidth,
-                startAngle: outerStart, endAngle: baseAngle + radians(5) + 2 * CGFloat.pi, clockwise: false)
-    ring.addLine(to: point(baseAngle + radians(5), radius - halfWidth))
-    ring.addArc(center: center, radius: radius - halfWidth,
-                startAngle: baseAngle + radians(5), endAngle: innerEnd, clockwise: true)
-    ring.closeSubpath()
-    ctx.setFillColor(brand)
-    ctx.addPath(ring)
-    ctx.fillPath()
-
-    // 箭头单独画，底边比环身宽一点，才是「箭头」而不是尖角
-    let headHalf = halfWidth + 12
-    let head = CGMutablePath()
-    head.move(to: point(baseAngle, radius + headHalf))
-    head.addLine(to: point(tipAngle, radius))
-    head.addLine(to: point(baseAngle, radius - headHalf))
-    head.closeSubpath()
-    ctx.addPath(head)
-    ctx.fillPath()
-
-    ctx.restoreGState()
+    ctx.textMatrix = .identity
+    ctx.textPosition = CGPoint(x: center.x - bounds.midX, y: center.y - bounds.midY)
+    CTLineDraw(line, ctx)
 }
 
 guard let image = ctx.makeImage() else { exit(1) }

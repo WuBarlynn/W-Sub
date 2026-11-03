@@ -178,6 +178,7 @@ private struct SubscriptionDeck: View {
     @Binding var index: Int
     let onSelect: (Subscription) -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var position: CGFloat = 0
     @State private var cardHeight: CGFloat = 420
 
@@ -213,59 +214,80 @@ private struct SubscriptionDeck: View {
     }
 
     private func card(_ entry: (item: Subscription, index: Int), height: CGFloat) -> some View {
-        let d = CGFloat(entry.index) - position
-        return SubscriptionDeckCard(subscription: entry.item)
+        let i = entry.index
+        let d = CGFloat(i) - position
+        return SubscriptionDeckCard(subscription: entry.item, isDark: colorScheme == .dark)
+            .equatable()
             .frame(height: height)
             .overlay {
                 // 越靠后的卡压一层黑，层次连续，卡片本体不用重算
                 RoundedRectangle(cornerRadius: 26, style: .continuous)
                     .fill(.black.opacity(0.26 * Double(min(2, max(0, d)))))
             }
-            .scaleEffect(scale(for: d), anchor: .top)
-            .offset(y: offset(for: d, height: height))
-            // 固定的层级：当前卡在最上，其余按距离排，不在拖动中反复调整
-            .zIndex(-Double(abs(entry.index - index)))
-            .allowsHitTesting(entry.index == index)
+            .scaleEffect(scale(for: i, d: d), anchor: .top)
+            .offset(y: offset(for: i, height: height))
+            .zIndex(zIndex(for: i))
+            .allowsHitTesting(i == index)
             .onTapGesture { onSelect(entry.item) }
     }
 
-    private func scale(for d: CGFloat) -> CGFloat {
-        if d >= 0 {
-            return 1 - 0.03 * min(2, d)
-        } else {
-            return 1 - 0.055 * min(1, -d)
-        }
+    private func scale(for i: Int, d: CGFloat) -> CGFloat {
+        guard i > index else { return 1 }
+        return 1 - 0.03 * min(2, max(0, d))
     }
 
-    private func offset(for d: CGFloat, height: CGFloat) -> CGFloat {
-        if d >= 0 {
-            return -9 * min(2, d)
-        } else {
-            return -height * 1.05 * min(1, -d)
+    /// 当前卡：位移完全等于手指位移（(index − position) × 卡片高度），所以是 1:1 跟手。
+    /// 上一张：从上方按同样的比例滑下来。后面的卡：原地缩着，只挪 9pt 露出边。
+    private func offset(for i: Int, height: CGFloat) -> CGFloat {
+        if i == index {
+            return (CGFloat(index) - position) * height
         }
+        if i > index {
+            return -9 * (CGFloat(i) - position)
+        }
+        return -(position - CGFloat(i)) * height
+    }
+
+    private func zIndex(for i: Int) -> Double {
+        if i == index { return 10 }
+        if i < index { return 9 }
+        return Double(10 - (i - index))
     }
 
     private var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 6)
+        DragGesture(minimumDistance: 0)
             .onChanged { value in
-                let delta = -value.translation.height / max(1, cardHeight)
-                position = rubberBand(positionStart + delta)
+                if dragStart == nil { dragStart = position }
+                let start = dragStart ?? position
+                position = rubberBand(start - value.translation.height / max(1, cardHeight))
             }
             .onEnded { value in
-                let projected = position - value.predictedEndTranslation.height / max(1, cardHeight) * 0.35
-                var target = abs(value.predictedEndTranslation.height) < 90
-                    ? position.rounded()
-                    : projected.rounded()
-                target = min(max(0, target), CGFloat(max(0, items.count - 1)))
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.86)) {
-                    position = target
+                let start = dragStart ?? position
+                dragStart = nil
+
+                // 位移过卡片高度的 18%，或者快速一甩（预测过 45%）才翻页
+                let translation = -value.translation.height / max(1, cardHeight)
+                let predicted = -value.predictedEndTranslation.height / max(1, cardHeight)
+                let base = start.rounded()
+
+                var target = base
+                if translation > 0.18 || predicted > 0.45 {
+                    target = base + 1
+                } else if translation < -0.18 || predicted < -0.45 {
+                    target = base - 1
                 }
-                positionStart = target
+                target = min(max(0, target), CGFloat(max(0, items.count - 1)))
+
+                withAnimation(.spring(response: 0.36, dampingFraction: 0.9)) {
+                    position = target
+                } completion: {
+                    let settled = Int(position.rounded())
+                    if settled != index { index = settled }
+                }
             }
     }
 
-    /// 拖动开始时记下起点，避免把每帧的增量累加到已经变化过的 position 上
-    @State private var positionStart: CGFloat = 0
+    @State private var dragStart: CGFloat?
 
     private func rubberBand(_ value: CGFloat) -> CGFloat {
         let maxIndex = CGFloat(max(0, items.count - 1))
@@ -410,10 +432,16 @@ private struct YearProgressCard: View {
 
 // MARK: - 黑色订阅卡
 
-private struct SubscriptionDeckCard: View {
-    let subscription: Subscription
+private struct SubscriptionDeckCard: View, Equatable {
+    nonisolated let subscription: Subscription
+    nonisolated let isDark: Bool
 
-    @Environment(\.colorScheme) private var colorScheme
+    /// 拖动时外层每帧都会重新构建这个值；相等就跳过 body，避免整张卡重排
+    nonisolated static func == (lhs: SubscriptionDeckCard, rhs: SubscriptionDeckCard) -> Bool {
+        lhs.subscription == rhs.subscription && lhs.isDark == rhs.isDark
+    }
+
+    private var colorScheme: ColorScheme { isDark ? .dark : .light }
 
     private var isActive: Bool { subscription.state == .active }
 

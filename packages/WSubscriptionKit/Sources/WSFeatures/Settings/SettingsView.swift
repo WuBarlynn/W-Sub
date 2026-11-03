@@ -15,8 +15,32 @@ public struct SettingsView: View {
     @State private var notificationsOn = false
     @State private var iconCount = IconStore.shared.count()
     @State private var confirmCleanIcons = false
+    @State private var rateDrafts: [String: String] = [:]
 
     public init() {}
+
+    private var snapshot: VaultSnapshot { model.snapshot ?? VaultSnapshot() }
+
+    /// 用到的外币（主币种之外），需要给它们设汇率才能真正加总
+    private var foreignCurrencies: [String] {
+        let primary = snapshot.settings.primaryCurrency
+        let codes = Set(snapshot.subscriptions.map { $0.price.currencyCode })
+        return codes.filter { $0 != primary }.sorted()
+    }
+
+    private func rateDraft(_ code: String) -> Binding<String> {
+        Binding(
+            get: {
+                rateDrafts[code]
+                    ?? NSDecimalNumber(decimal: snapshot.settings.manualRates[code] ?? 1).stringValue
+            },
+            set: { text in
+                rateDrafts[code] = text
+                guard let value = Decimal(string: text), value > 0 else { return }
+                Task { await model.updateSettings { $0.manualRates[code] = value } }
+            }
+        )
+    }
 
     public var body: some View {
         NavigationStack {
@@ -96,6 +120,40 @@ public struct SettingsView: View {
                             }
                         }
                         .buttonStyle(.plain)
+                    }
+                }
+
+                Section("记账") {
+                    Picker("主币种", selection: Binding(
+                        get: { snapshot.settings.primaryCurrency },
+                        set: { code in
+                            Task { await model.updateSettings { $0.primaryCurrency = code } }
+                        }
+                    )) {
+                        ForEach(CurrencyCatalog.common) { item in
+                            Text("\(item.symbol) \(item.code)").tag(item.code)
+                        }
+                    }
+
+                    if foreignCurrencies.isEmpty {
+                        Text("没有外币订阅")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(foreignCurrencies, id: \.self) { code in
+                            HStack(spacing: 8) {
+                                Text("1 \(code) =")
+                                    .font(.system(size: 14))
+                                Spacer(minLength: 8)
+                                TextField("1", text: rateDraft(code))
+                                    .keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(maxWidth: 90)
+                                Text(snapshot.settings.primaryCurrency)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
 

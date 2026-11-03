@@ -6,8 +6,24 @@ import WSCore
 // MARK: - 图标资源
 
 enum BrandAssets {
+    /// 卡片翻页时每帧都会取图，UIImage(named:) 虽然内部有缓存但每次仍要走一趟资源查找，
+    /// 这里自己缓存一次，拖动时就是纯字典查找。
+    nonisolated(unsafe) private static var cache: [String: UIImage] = [:]
+    nonisolated(unsafe) private static var missing: Set<String> = []
+
+    static func image(_ name: String) -> UIImage? {
+        if let cached = cache[name] { return cached }
+        if missing.contains(name) { return nil }
+        guard let image = UIImage(named: name, in: .module, compatibleWith: nil) else {
+            missing.insert(name)
+            return nil
+        }
+        cache[name] = image
+        return image
+    }
+
     static func has(_ name: String) -> Bool {
-        UIImage(named: name, in: .module, compatibleWith: nil) != nil
+        image(name) != nil
     }
 }
 
@@ -44,17 +60,17 @@ public struct IconTile: View {
                     .scaledToFill()
                     .frame(width: size, height: size)
                     .clipShape(shape)
-            } else if let brand, BrandAssets.has(brand) {
+            } else if let brand, let brandImage = BrandAssets.image(brand) {
                 if isFullColor {
                     // 源图已规整为正方形画布，等比铺满不会裁掉任何内容
-                    Image(brand, bundle: .module)
+                    Image(uiImage: brandImage)
                         .resizable()
                         .scaledToFill()
                         .frame(width: size, height: size)
                         .clipped()
                         .clipShape(shape)
                 } else {
-                    Image(brand, bundle: .module)
+                    Image(uiImage: brandImage)
                         .resizable()
                         .scaledToFit()
                         .padding(size * 0.22)

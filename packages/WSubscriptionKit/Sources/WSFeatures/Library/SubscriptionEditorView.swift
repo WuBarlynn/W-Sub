@@ -8,7 +8,7 @@ struct SubscriptionEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let original: Subscription?
-    private let currency: String
+    @State private var currency: String
 
     @State private var draft: Subscription
     @State private var amountText: String
@@ -22,7 +22,7 @@ struct SubscriptionEditorView: View {
          template: SubscriptionTemplate? = nil,
          currency: String = "CNY") {
         self.original = subscription
-        self.currency = currency
+        _currency = State(initialValue: subscription?.price.currencyCode ?? currency)
 
         if let subscription {
             _draft = State(initialValue: subscription)
@@ -91,9 +91,21 @@ struct SubscriptionEditorView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(maxWidth: 150)
-                        Text(currency)
-                            .font(.system(size: 13))
+                        Menu {
+                            Picker("币种", selection: $currency) {
+                                ForEach(CurrencyCatalog.common) { item in
+                                    Text("\(item.symbol) \(item.code)  \(item.name)").tag(item.code)
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 3) {
+                                Text(currency)
+                                    .font(.system(size: 13))
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 9, weight: .semibold))
+                            }
                             .foregroundStyle(.secondary)
+                        }
                     }
 
                     Picker("周期", selection: $cycleChoice) {
